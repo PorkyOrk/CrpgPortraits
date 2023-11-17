@@ -1,6 +1,9 @@
 @Crpg.Api_HostAddress = http://localhost:5100
 
-GET {{CrpgPortraits.Api_HostAddress}}/weatherforecast/
+GET {{CrpgPortraits.Api_HostAddress}}/
 Accept: application/json
 
 ###
+
+GET {{CrpgPortraits.Api_HostAddress}}/myendpoint
+Accept: application/json
