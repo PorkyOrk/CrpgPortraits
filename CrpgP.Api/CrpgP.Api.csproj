@@ -22,7 +22,6 @@
     <ItemGroup>
       <ProjectReference Include="..\CrpgP.Application\CrpgP.Application.csproj" />
       <ProjectReference Include="..\CrpgP.Infrastructure\CrpgP.Infrastructure.csproj" />
-      <ProjectReference Include="..\CrpgP.Presentation\CrpgP.Presentation.csproj" />
     </ItemGroup>
 
 </Project>
