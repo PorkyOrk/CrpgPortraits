@@ -1,6 +1,6 @@
 ﻿using CrpgP.Domain.Entities;
 
-namespace CrpgP.Application.Repositories;
+namespace CrpgP.Domain.Abstractions;
 
 public interface ITagRepository
 {

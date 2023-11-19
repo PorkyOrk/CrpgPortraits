@@ -5,9 +5,9 @@ namespace CrpgP.Infrastructure.DataProvider.Postgres;
 
 internal static class DbHelper
 {
-    internal static string GetConnectionString(IConfiguration config)
+    internal static string GetConnectionString(IConfiguration configuration)
     {
-        return config.GetConnectionString("PostgresDB") 
+        return configuration.GetConnectionString("DefaultConnection") 
             ?? throw new ArgumentException("Missing PostgresDB connection string");
     }
     

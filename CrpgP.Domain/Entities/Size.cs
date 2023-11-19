@@ -1,8 +1,16 @@
-﻿namespace CrpgP.Domain.Entities;
+﻿using CrpgP.Domain.Primitives;
 
-public class Size
+namespace CrpgP.Domain.Entities;
+
+public class Size: Entity
 {
-    public int Id { get; }
     public int Width { get; set; }
     public int Height { get; set; }
+
+    public Size(int id, int width, int height)
+        : base(id)
+    {
+        Width = width;
+        Height = height;
+    }
 }

@@ -1,4 +1,4 @@
-﻿namespace CrpgP.Api;
+﻿namespace CrpgP.WebApi;
 
 public static class Endpoints
 {
@@ -24,26 +24,45 @@ public static class Endpoints
         // =====================================================
         
         
-        
-        
         // *********************
-        // **** Portraits ******
+        // ******* Game ********
+        // Get game by Id
+        // app.MapGet("/game/{id}", (
+        //     HttpContext context,
+        //     [FromRoute] int id,
+        //     [FromServices] IConfiguration config) =>
+        // {
+        //     var x = new SearchGame(new GameRepository(config));
+        //     var g = x.FindById(id);
+        //
+        //     context.Response.WriteAsync(g.Name);
+        // });
+        
+        
+        
+        
+        // Get game by Name
+
+
+
+        // ********************
+        // **** Portrait ******
         // Get portrait by Id
         // Get portraits by ids[]
         // Get portraits[] by tag Id
-        
-        
-        // *********************
-        // ******* Tags ********
+
+
+        // ********************
+        // ******* Tag ********
         // Get tag by Id
         // Get tag by Name
         // Get tags[] by portrait id
-        
-        
 
-        
-        
-        
-        
+
+
+
+
+
+
     }
 }

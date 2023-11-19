@@ -1,8 +1,16 @@
-﻿namespace CrpgP.Domain.Entities;
+﻿using CrpgP.Domain.Primitives;
 
-public class Game
+namespace CrpgP.Domain.Entities;
+
+public class Game : Entity
 {
-    public int Id { get; }
     public string Name { get; set; }
     public Size PortraitSize { get; set; }
+
+    public Game(int id, string name, Size portraitSize)
+        :base(id)
+    {
+        Name = name;
+        PortraitSize = portraitSize;
+    }
 }
