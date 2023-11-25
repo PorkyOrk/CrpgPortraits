@@ -17,11 +17,7 @@
 
     <ItemGroup>
       <Folder Include="Abstractions\" />
-      <Folder Include="Behaviours\" />
       <Folder Include="Exceptions\" />
-      <Folder Include="Portraits\" />
-      <Folder Include="Sizes\" />
-      <Folder Include="Tags\" />
     </ItemGroup>
 
 </Project>

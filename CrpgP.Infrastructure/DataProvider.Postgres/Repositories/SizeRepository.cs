@@ -21,17 +21,17 @@ public class SizeRepository : Repository, ISizeRepository
         throw new NotImplementedException();
     }
 
-    public void Insert(Size tag)
+    public void Insert(Size size)
     {
         throw new NotImplementedException();
     }
 
-    public void Update(Size tag)
+    public void Update(Size size)
     {
         throw new NotImplementedException();
     }
 
-    public void Delete(int tagId)
+    public void Delete(int sizeId)
     {
         throw new NotImplementedException();
     }

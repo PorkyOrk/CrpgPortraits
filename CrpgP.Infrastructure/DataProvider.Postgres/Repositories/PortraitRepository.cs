@@ -16,7 +16,7 @@ public class PortraitRepository : Repository, IPortraitRepository
         throw new NotImplementedException();
     }
 
-    public IEnumerable<Portrait> GetByIds(Guid[] portraitIds)
+    public IEnumerable<Portrait> GetByIds(int[] portraitIds)
     {
         throw new NotImplementedException();
     }
