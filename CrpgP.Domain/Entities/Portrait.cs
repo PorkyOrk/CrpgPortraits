@@ -1,9 +1,8 @@
-﻿using CrpgP.Domain.Primitives;
+﻿namespace CrpgP.Domain.Entities;
 
-namespace CrpgP.Domain.Entities;
-
-public class Portrait : Entity
+public class Portrait
 {
+    public int Id { get; init; }
     public string FileName { get; set; }
     public string? DisplayName { get; set; }
     public string? Description { get; set; }
@@ -15,10 +14,20 @@ public class Portrait : Entity
     public Portrait()
     {
     }
+    
+    public Portrait(string fileName, string? displayName, string? description, Size size, DateTime created, Tag[] tags)
+    {
+        FileName = fileName;
+        Size = size;
+        DisplayName = displayName;
+        Description = description;
+        Tags = tags;
+        Created = created;
+    }
 
     public Portrait(int id, string fileName, string? displayName, string? description, Size size, DateTime created, Tag[] tags)
-        : base(id)
     {
+        Id = id;
         FileName = fileName;
         Size = size;
         DisplayName = displayName;

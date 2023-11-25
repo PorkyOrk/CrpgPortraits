@@ -52,7 +52,8 @@ public static class GameEndpoints
         {
             try
             {
-                await handler.InsertGameAsync(context.Request.Body.ToString());
+                var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
+                await handler.InsertGameAsync(body);
                 return Results.Ok();
             }
             catch (Exception e)

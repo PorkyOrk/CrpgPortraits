@@ -17,7 +17,10 @@ public class GameRepository : Repository, IGameRepository
         using (var conn = DbHelper.CreateConnection(ConnectionString))
         {
             var sql =  "SELECT * FROM games WHERE id = @GameId;";
-            var output = conn.QueryFirstAsync<Game>(sql, new { GameId = gameId });
+            var output = conn.QueryFirstAsync<Game>(sql, new
+            {
+                GameId = gameId
+            });
 
             return await output;
         }
@@ -28,7 +31,10 @@ public class GameRepository : Repository, IGameRepository
         using (var conn = DbHelper.CreateConnection(ConnectionString))
         {
             var sql =  "SELECT * FROM games WHERE name = @GameName;";
-            var output = conn.QueryFirstAsync<Game>(sql, new { GameName = gameName });
+            var output = conn.QueryFirstAsync<Game>(sql, new
+            {
+                GameName = gameName
+            });
 
             return await output;
         }
@@ -38,8 +44,11 @@ public class GameRepository : Repository, IGameRepository
     {
         using (var conn = DbHelper.CreateConnection(ConnectionString))
         {
-            var sql =  "INSERT INTO games VALUES name = @GameName;";
-            await conn.QueryAsync(sql, new {game.Name});
+            var sql =  "INSERT INTO games (name) VALUES (@GameName);";
+            await conn.QueryAsync(sql, new
+            {
+                GameName = game.Name
+            });
         }
     }
     
@@ -48,7 +57,11 @@ public class GameRepository : Repository, IGameRepository
         using (var conn = DbHelper.CreateConnection(ConnectionString))
         {
             var updateGamesSql =  "UPDATE games SET name = @GameName WHERE id = @GameId;";
-            await conn.QueryAsync(updateGamesSql, new {game.Name, game.Id});
+            await conn.QueryAsync(updateGamesSql, new
+            {
+                GameName = game.Name,
+                GameId = game.Id
+            });
         }
     }
 
@@ -57,7 +70,10 @@ public class GameRepository : Repository, IGameRepository
         using (var conn = DbHelper.CreateConnection(ConnectionString))
         {
             var sql =  "DELETE * FROM games WHERE id = @GameId;";
-            await conn.QueryFirstAsync<Game>(sql, new { GameId = gameId });
+            await conn.QueryFirstAsync<Game>(sql, new
+            {
+                GameId = gameId
+            });
         }
     }
 }

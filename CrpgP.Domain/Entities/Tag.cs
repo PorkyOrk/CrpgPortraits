@@ -1,17 +1,22 @@
-﻿using CrpgP.Domain.Primitives;
+﻿namespace CrpgP.Domain.Entities;
 
-namespace CrpgP.Domain.Entities;
-
-public class Tag : Entity
+public class Tag
 {
+    public int Id { get; init; }
     public string Name { get; set;}
 
     public Tag()
     {
     }
     
-    public Tag(int id, string name) : base(id)
+    public Tag(string name)
     {
+        Name = name;
+    }
+    
+    public Tag(int id, string name)
+    {
+        Id = id;
         Name = name;
     }
 }
