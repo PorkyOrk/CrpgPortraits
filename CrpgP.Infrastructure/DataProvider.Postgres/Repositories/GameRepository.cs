@@ -69,7 +69,7 @@ public class GameRepository : Repository, IGameRepository
     {
         using (var conn = DbHelper.CreateConnection(ConnectionString))
         {
-            var sql =  "DELETE * FROM games WHERE id = @GameId;";
+            var sql =  "DELETE FROM games WHERE id = @GameId;";
             await conn.QueryFirstAsync<Game>(sql, new
             {
                 GameId = gameId
