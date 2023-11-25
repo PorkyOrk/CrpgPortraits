@@ -10,6 +10,8 @@ public static class GameEndpoints
         
         app.MapGet("api/v1/game/{id}", async Task<IResult>(int id) =>
         {
+            // TODO: Instead of a try catch block the handler method should return a result object 
+            
             try
             {
                 var result = await handler.FindGameByIdAsync(id);
@@ -35,7 +37,7 @@ public static class GameEndpoints
             }
         });
         
-        app.MapGet("api/v1/game/delete/{id}", async Task<IResult>(int id) =>
+        app.MapDelete("api/v1/game/delete/{id}", async Task<IResult>(int id) =>
         {
             try
             {
@@ -66,7 +68,8 @@ public static class GameEndpoints
         {
             try
             {
-                await handler.UpdateGameAsync(context.Request.Body.ToString());
+                var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
+                await handler.UpdateGameAsync(body);
                 return Results.Ok();
             }
             catch (Exception e)
@@ -80,8 +83,9 @@ public static class GameEndpoints
     
     private static IResult Handle(Exception e)
     {
-        //TODO, Consider moving this to a static class
+        //TODO
         
+        Console.WriteLine(e.Message); 
         return Results.Empty; 
     }
 }

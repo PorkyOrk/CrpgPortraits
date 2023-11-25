@@ -16,7 +16,7 @@ public class GameRepository : Repository, IGameRepository
     {
         using (var conn = DbHelper.CreateConnection(ConnectionString))
         {
-            var sql =  "SELECT * FROM games WHERE id = @GameId;";
+            const string sql = "SELECT * FROM games WHERE id = @GameId;";
             var output = conn.QueryFirstAsync<Game>(sql, new
             {
                 GameId = gameId
@@ -30,7 +30,7 @@ public class GameRepository : Repository, IGameRepository
     {
         using (var conn = DbHelper.CreateConnection(ConnectionString))
         {
-            var sql =  "SELECT * FROM games WHERE name = @GameName;";
+            const string sql = "SELECT * FROM games WHERE name = @GameName;";
             var output = conn.QueryFirstAsync<Game>(sql, new
             {
                 GameName = gameName
@@ -44,7 +44,7 @@ public class GameRepository : Repository, IGameRepository
     {
         using (var conn = DbHelper.CreateConnection(ConnectionString))
         {
-            var sql =  "INSERT INTO games (name) VALUES (@GameName);";
+            const string sql = "INSERT INTO games (name) VALUES (@GameName);";
             await conn.QueryAsync(sql, new
             {
                 GameName = game.Name
@@ -56,7 +56,7 @@ public class GameRepository : Repository, IGameRepository
     {
         using (var conn = DbHelper.CreateConnection(ConnectionString))
         {
-            var updateGamesSql =  "UPDATE games SET name = @GameName WHERE id = @GameId;";
+            const string updateGamesSql = "UPDATE games SET name = @GameName WHERE id = @GameId;";
             await conn.QueryAsync(updateGamesSql, new
             {
                 GameName = game.Name,
@@ -69,7 +69,7 @@ public class GameRepository : Repository, IGameRepository
     {
         using (var conn = DbHelper.CreateConnection(ConnectionString))
         {
-            var sql =  "DELETE FROM games WHERE id = @GameId;";
+            const string sql = "DELETE FROM games WHERE id = @GameId;";
             await conn.QueryFirstAsync<Game>(sql, new
             {
                 GameId = gameId

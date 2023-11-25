@@ -34,7 +34,7 @@ public class GameHandler
         }
     }
     
-    public async Task UpdateGameAsync(string? payload)
+    public async Task UpdateGameAsync(string payload)
     {
         var game = MapJsonToGame(payload);
 
