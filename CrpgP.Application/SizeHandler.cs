@@ -3,11 +3,11 @@ using CrpgP.Domain.Entities;
 
 namespace CrpgP.Application;
 
-public class SizeRepositoryHandler
+public class SizeHandler
 {
     private readonly ISizeRepository _repository;
     
-    public SizeRepositoryHandler(ISizeRepository repository)
+    public SizeHandler(ISizeRepository repository)
     {
         _repository = repository;
     }

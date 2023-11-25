@@ -12,6 +12,10 @@ public class Portrait : Entity
     public Tag[] Tags { get; set; }
     public DateTime Created { get; }
 
+    public Portrait()
+    {
+    }
+
     public Portrait(int id, string fileName, string? displayName, string? description, Size size, DateTime created, Tag[] tags)
         : base(id)
     {

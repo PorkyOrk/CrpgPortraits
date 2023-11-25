@@ -3,11 +3,11 @@ using CrpgP.Domain.Entities;
 
 namespace CrpgP.Application;
 
-public class TagRepositoryHandler
+public class TagHandler
 {
     private readonly ITagRepository _repository;
 
-    public TagRepositoryHandler(ITagRepository repository)
+    public TagHandler(ITagRepository repository)
     {
         _repository = repository;
     }

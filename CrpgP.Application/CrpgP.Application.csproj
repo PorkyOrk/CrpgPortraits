@@ -17,7 +17,12 @@
 
     <ItemGroup>
       <Folder Include="Abstractions\" />
-      <Folder Include="Exceptions\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions">
+        <HintPath>C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.0\Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

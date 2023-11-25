@@ -12,45 +12,52 @@ public class GameRepository : Repository, IGameRepository
     {
     }
     
-    public Game GetById(int gameId)
+    public async Task<Game> GetByIdAsync(int gameId)
     {
         using (var conn = DbHelper.CreateConnection(ConnectionString))
         {
             var sql =  "SELECT * FROM games WHERE id = @GameId;";
-            var output = conn.QueryFirst<Game>(sql, new { GameId = gameId });
+            var output = conn.QueryFirstAsync<Game>(sql, new { GameId = gameId });
 
-            return output;
+            return await output;
         }
     }
-    public Game GetByName(string gameName)
+    
+    public async Task<Game> GetByNameAsync(string gameName)
     {
         using (var conn = DbHelper.CreateConnection(ConnectionString))
         {
             var sql =  "SELECT * FROM games WHERE name = @GameName;";
-            var output = conn.QueryFirst<Game>(sql, new { GameName = gameName });
+            var output = conn.QueryFirstAsync<Game>(sql, new { GameName = gameName });
 
-            return output;
+            return await output;
+        }
+    }
+    
+    public async Task InsertAsync(Game game)
+    {
+        using (var conn = DbHelper.CreateConnection(ConnectionString))
+        {
+            var sql =  "INSERT INTO games VALUES name = @GameName;";
+            await conn.QueryAsync(sql, new {game.Name});
+        }
+    }
+    
+    public async Task UpdateAsync(Game game)
+    {
+        using (var conn = DbHelper.CreateConnection(ConnectionString))
+        {
+            var updateGamesSql =  "UPDATE games SET name = @GameName WHERE id = @GameId;";
+            await conn.QueryAsync(updateGamesSql, new {game.Name, game.Id});
         }
     }
 
-    
-    
-    
-    public void Insert(Game game)
-    {
-        throw new NotImplementedException();
-    }
-    public void Update(Game game)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Delete(int gameId)
+    public async Task DeleteAsync(int gameId)
     {
         using (var conn = DbHelper.CreateConnection(ConnectionString))
         {
             var sql =  "DELETE * FROM games WHERE id = @GameId;";
-            conn.QueryFirst<Game>(sql, new { GameId = gameId });
+            await conn.QueryFirstAsync<Game>(sql, new { GameId = gameId });
         }
     }
 }

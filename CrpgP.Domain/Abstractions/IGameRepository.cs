@@ -4,11 +4,9 @@ namespace CrpgP.Domain.Abstractions;
 
 public interface IGameRepository
 {
-    //public Task<Game> GetByIdAsync(int gameId);
-    
-    public Game GetById(int gameId);
-    public Game GetByName(string gameName);
-    public void Insert(Game game);
-    public void Update(Game game);
-    public void Delete(int gameId);
+    public Task<Game> GetByIdAsync(int gameId);
+    public Task<Game> GetByNameAsync(string gameName);
+    public Task InsertAsync(Game game);
+    public Task UpdateAsync(Game game);
+    public Task DeleteAsync(int gameId);
 }

@@ -7,6 +7,10 @@ public class Game : Entity
     public string Name { get; set; }
     public Size PortraitSize { get; set; }
 
+    public Game()
+    {
+    }
+
     public Game(int id, string name, Size portraitSize)
         :base(id)
     {
