@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json;
-using CrpgP.Application.Result;
+﻿using CrpgP.Application.Result;
 using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
 
@@ -35,7 +33,8 @@ public class GameService
     
     public async Task<Result<int>> CreateGameAsync(string payload)
     {
-        var game = MapJsonToGame(payload);
+        Validation.Validation.RequestInput(payload);
+        var game = Validation.Validation.MapToType<Game>(payload);
 
         try
         {
@@ -50,7 +49,8 @@ public class GameService
 
     public async Task<Result<object>> UpdateGameAsync(string payload)
     {
-        var game = MapJsonToGame(payload);
+        Validation.Validation.RequestInput(payload);
+        var game = Validation.Validation.MapToType<Game>(payload);
 
         try
         {
@@ -75,22 +75,4 @@ public class GameService
             return Result<object>.Failure(e.Message);
         }
     }
-
-    private static Game MapJsonToGame(string? payload)
-    {
-        if (string.IsNullOrWhiteSpace(payload))
-        {
-            throw new ValidationException("Empty payload.");
-        }
-        
-        var game = JsonSerializer.Deserialize<Game>(payload, JsonSerializerOptions.Default);
-        
-        if (game == null)
-        {
-            throw new ValidationException("Unable to map payload to Game object.");
-        }
-
-        return game;
-    }
-
 }
