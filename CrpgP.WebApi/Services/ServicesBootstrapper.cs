@@ -16,7 +16,7 @@ public static class ServicesBootstrapper
         serviceCollection.AddEndpointsApiExplorer();
         serviceCollection.AddSwaggerGen();
         
-        // Repositories
+        // Infrastructure Repositories
         serviceCollection.AddSingleton<ITagRepository, TagRepository>();
         serviceCollection.AddSingleton<IPortraitRepository, PortraitRepository>();
         serviceCollection.AddSingleton<ISizeRepository, SizeRepository>();
