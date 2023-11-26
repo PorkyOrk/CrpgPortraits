@@ -2,7 +2,7 @@
 
 namespace CrpgP.Application.Health;
 
-public class DbHealthCheck : IHealthCheck
+public class HealthCheck : IHealthCheck
 {
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {

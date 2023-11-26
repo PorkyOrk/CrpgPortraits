@@ -1,4 +1,5 @@
-﻿using CrpgP.Application.Health;
+﻿using CrpgP.Application;
+using CrpgP.Application.Health;
 using CrpgP.Domain.Abstractions;
 using CrpgP.Infrastructure.DataProvider.Postgres.Repositories;
 
@@ -9,9 +10,7 @@ public static class ServicesBootstrapper
     public static void RegisterServices(this IServiceCollection serviceCollection)
     {
         // Health Check
-        // serviceCollection.AddHealthChecks().AddCheck<HealthCheck>("HealthCheck");
-        serviceCollection.AddHealthChecks().AddCheck<DbHealthCheck>("DbHealthCheck");
-
+        serviceCollection.AddHealthChecks().AddCheck<HealthCheck>("HealthCheck");
         
         // Swagger
         serviceCollection.AddEndpointsApiExplorer();
@@ -22,5 +21,11 @@ public static class ServicesBootstrapper
         serviceCollection.AddSingleton<IPortraitRepository, PortraitRepository>();
         serviceCollection.AddSingleton<ISizeRepository, SizeRepository>();
         serviceCollection.AddSingleton<IGameRepository, GameRepository>();
+        
+        // Application Services
+        serviceCollection.AddSingleton<GameService>();
+        serviceCollection.AddSingleton<PortraitService>();
+        serviceCollection.AddSingleton<SizeService>();
+        serviceCollection.AddSingleton<TagService>();
     }
 }
