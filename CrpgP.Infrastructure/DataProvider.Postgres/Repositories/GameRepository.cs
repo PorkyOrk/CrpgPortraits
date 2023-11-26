@@ -12,40 +12,38 @@ public class GameRepository : Repository, IGameRepository
     {
     }
     
-    public async Task<Game> GetByIdAsync(int gameId)
+    public async Task<Game?> FindByIdAsync(int gameId)
     {
         using (var conn = DbHelper.CreateConnection(ConnectionString))
         {
             const string sql = "SELECT * FROM games WHERE id = @GameId;";
-            var output = conn.QueryFirstAsync<Game>(sql, new
+            return await conn.QueryFirstOrDefaultAsync<Game>(sql, new
             {
                 GameId = gameId
             });
-
-            return await output;
         }
     }
     
-    public async Task<Game> GetByNameAsync(string gameName)
+    public async Task<Game?> FindByNameAsync(string gameName)
     {
         using (var conn = DbHelper.CreateConnection(ConnectionString))
         {
             const string sql = "SELECT * FROM games WHERE name = @GameName;";
-            var output = conn.QueryFirstAsync<Game>(sql, new
+            return await conn.QueryFirstOrDefaultAsync<Game>(sql, new
             {
                 GameName = gameName
             });
-
-            return await output;
         }
     }
     
-    public async Task InsertAsync(Game game)
+    public async Task<int> InsertAsync(Game game)
     {
         using (var conn = DbHelper.CreateConnection(ConnectionString))
         {
-            const string sql = "INSERT INTO games (name) VALUES (@GameName);";
-            await conn.QueryAsync(sql, new
+            const string sql = "INSERT INTO games (name) VALUES (@GameName);" +
+                               "SELECT currval('games_id_seq');";
+            
+            return await conn.QuerySingleAsync<int>(sql, new
             {
                 GameName = game.Name
             });

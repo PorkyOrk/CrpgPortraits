@@ -3,11 +3,11 @@ using CrpgP.Domain.Entities;
 
 namespace CrpgP.Application;
 
-public class PortraitHandler
+public class PortraitService
 {
     private readonly IPortraitRepository _repository;
     
-    public PortraitHandler(IPortraitRepository repository)
+    public PortraitService(IPortraitRepository repository)
     {
         _repository = repository;
     }

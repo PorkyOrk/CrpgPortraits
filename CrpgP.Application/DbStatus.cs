@@ -7,7 +7,6 @@ public class DbStatus
 
     public DbStatus()
     {
-        
     }
     
     
