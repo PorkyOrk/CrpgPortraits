@@ -1,15 +1,18 @@
 ﻿using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
+using Serilog;
 
 namespace CrpgP.Application;
 
 public class TagService
 {
     private readonly ITagRepository _repository;
+    private readonly ILogger _logger;
 
-    public TagService(ITagRepository repository)
+    public TagService(ITagRepository repository, ILogger logger)
     {
         _repository = repository;
+        _logger = logger;
     }
 
     public Tag FindTagById(int tagId)

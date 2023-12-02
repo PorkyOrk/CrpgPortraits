@@ -52,7 +52,6 @@ public class GameRepository : Repository, IGameRepository
             GameName = game.Name,
             GameId = game.Id
         });
-        
     }
 
     public async Task DeleteAsync(int gameId)

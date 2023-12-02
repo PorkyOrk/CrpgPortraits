@@ -10,7 +10,9 @@ public static class ServicesBootstrapper
     public static void RegisterServices(this IServiceCollection serviceCollection, IConfiguration configuration)
     {
         // Database
-        serviceCollection.AddNpgsqlDataSource(configuration.GetConnectionString("Default Connection") ?? throw new InvalidOperationException());
+        serviceCollection.AddNpgsqlDataSource(
+            configuration.GetConnectionString("DefaultConnection") 
+            ?? throw new InvalidOperationException("Missing connection string"));
         
         // Health Check
         serviceCollection.AddHealthChecks().AddCheck<HealthCheck>("HealthCheck");

@@ -1,15 +1,18 @@
 ﻿using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
+using Serilog;
 
 namespace CrpgP.Application;
 
 public class PortraitService
 {
     private readonly IPortraitRepository _repository;
+    private readonly ILogger _logger;
     
-    public PortraitService(IPortraitRepository repository)
+    public PortraitService(IPortraitRepository repository, ILogger logger)
     {
         _repository = repository;
+        _logger = logger;
     }
     
     public Portrait FindPortraitById(int id)

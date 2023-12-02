@@ -7,7 +7,8 @@ public static class GameEndpoints
     public static void MapGameEndpoints(this WebApplication app)
     {
         var gameService = app.Services.GetService<GameService>()
-                          ?? throw new NullReferenceException("Unable to find Game Service.");
+            ?? throw new NullReferenceException("Unable to find Game Service.");
+        
         
         app.MapGet("api/v1/game/{id}", async Task<IResult>(int id) =>
         {

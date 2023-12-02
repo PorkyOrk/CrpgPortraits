@@ -1,15 +1,18 @@
 ﻿using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
+using Serilog;
 
 namespace CrpgP.Application;
 
 public class SizeService
 {
     private readonly ISizeRepository _repository;
+    private readonly ILogger _logger;
     
-    public SizeService(ISizeRepository repository)
+    public SizeService(ISizeRepository repository, ILogger logger)
     {
         _repository = repository;
+        _logger = logger;
     }
     
     public Size FindSizeById(int id)

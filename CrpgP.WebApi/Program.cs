@@ -16,6 +16,12 @@ builder.Host.UseSerilog((hostContext, services, configuration) =>
 // Build the application
 var app = builder.Build();
 
+// Request Logging Middleware for development environment
+if (app.Environment.IsDevelopment())
+{
+    app.UseSerilogRequestLogging();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
