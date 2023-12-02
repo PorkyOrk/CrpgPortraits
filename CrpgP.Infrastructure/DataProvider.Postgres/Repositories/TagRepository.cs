@@ -2,13 +2,14 @@
 using CrpgP.Domain.Entities;
 using CrpgP.Infrastructure.DataProvider.Postgres.Abstractions;
 using Microsoft.Extensions.Configuration;
+using Npgsql;
 
 namespace CrpgP.Infrastructure.DataProvider.Postgres.Repositories;
 
 public class TagRepository : Repository, ITagRepository
 {
 
-    public TagRepository(IConfiguration configuration) : base(configuration) 
+    public TagRepository(NpgsqlDataSource dataSource) : base(dataSource) 
     {
     }
     

@@ -1,13 +1,13 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Npgsql;
 
 namespace CrpgP.Infrastructure.DataProvider.Postgres.Abstractions;
 
 public abstract class Repository
 {
-    protected readonly string ConnectionString;
-
-    protected Repository(IConfiguration configuration)
+    protected readonly NpgsqlDataSource DataSource;
+    
+    protected Repository(NpgsqlDataSource dataSource)
     {
-        ConnectionString = DbHelper.GetConnectionString(configuration);
+        DataSource = dataSource;
     }
 }

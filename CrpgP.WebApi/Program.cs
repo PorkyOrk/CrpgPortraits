@@ -3,7 +3,8 @@ using CrpgP.WebApi.Services;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.RegisterServices();
+
+builder.Services.RegisterServices(builder.Configuration);
 
 // Remove default logging providers
 builder.Logging.ClearProviders();

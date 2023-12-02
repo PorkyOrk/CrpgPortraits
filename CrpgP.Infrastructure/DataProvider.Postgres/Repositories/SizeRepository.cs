@@ -2,12 +2,13 @@
 using CrpgP.Domain.Entities;
 using CrpgP.Infrastructure.DataProvider.Postgres.Abstractions;
 using Microsoft.Extensions.Configuration;
+using Npgsql;
 
 namespace CrpgP.Infrastructure.DataProvider.Postgres.Repositories;
 
 public class SizeRepository : Repository, ISizeRepository
 {
-    public SizeRepository(IConfiguration configuration) : base(configuration)
+    public SizeRepository(NpgsqlDataSource dataSource) : base(dataSource)
     {
     }
 

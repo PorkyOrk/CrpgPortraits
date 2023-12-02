@@ -1,13 +1,13 @@
 ﻿using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
 using CrpgP.Infrastructure.DataProvider.Postgres.Abstractions;
-using Microsoft.Extensions.Configuration;
+using Npgsql;
 
 namespace CrpgP.Infrastructure.DataProvider.Postgres.Repositories;
 
 public class PortraitRepository : Repository, IPortraitRepository
 {
-    public PortraitRepository(IConfiguration configuration) : base(configuration)
+    public PortraitRepository(NpgsqlDataSource dataSource) : base(dataSource)
     {
     }
 
