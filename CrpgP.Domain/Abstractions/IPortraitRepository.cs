@@ -4,9 +4,9 @@ namespace CrpgP.Domain.Abstractions;
 
 public interface IPortraitRepository
 {
-    public Portrait GetById(int portraitId);
-    public IEnumerable<Portrait> GetByIds(int[] portraitIds);
-    public void Insert(Portrait portrait);
-    public void Update(Portrait portrait);
-    public void Delete(int portraitId);
+    public Task<Portrait?> FindByIdAsync(int portraitId);
+    public Task<IEnumerable<Portrait>?> FindByIdsAsync(int[] portraitIds);
+    public Task<int> InsertAsync(Portrait portrait);
+    public Task UpdateAsync(Portrait portrait);
+    public Task DeleteAsync(int portraitId);
 }

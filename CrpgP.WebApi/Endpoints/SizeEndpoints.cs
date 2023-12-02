@@ -7,7 +7,7 @@ public static class SizeEndpoints
     public static void MapSizeEndpoints(this WebApplication app)
     {
         var sizeService = app.Services.GetService<SizeService>()
-                              ?? throw new NullReferenceException("Unable to find Size Service.");
+            ?? throw new NullReferenceException("Unable to find Size Service.");
         
         app.MapGet("api/v1/size/{id}", async Task<IResult>(int id) =>
         {

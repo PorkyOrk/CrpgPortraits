@@ -7,7 +7,7 @@ public static class PortraitEndpoints
     public static void MapPortraitEndpoints(this WebApplication app)
     {
         var portraitService = app.Services.GetService<PortraitService>()
-                          ?? throw new NullReferenceException("Unable to find Portrait Service.");
+            ?? throw new NullReferenceException("Unable to find Portrait Service.");
         
         app.MapGet("api/v1/portrait/{id}", async Task<IResult>(int id) =>
         {

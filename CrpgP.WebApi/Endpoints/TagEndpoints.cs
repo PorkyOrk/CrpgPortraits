@@ -7,7 +7,7 @@ public static class TagEndpoints
     public static void MapTagEndpoints(this WebApplication app)
     {
         var tagService = app.Services.GetService<TagService>()
-                          ?? throw new NullReferenceException("Unable to find Tag Service.");
+            ?? throw new NullReferenceException("Unable to find Tag Service.");
         
         app.MapGet("api/v1/tag/{id}", async Task<IResult>(int id) =>
         {

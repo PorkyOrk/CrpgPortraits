@@ -1,4 +1,5 @@
-﻿using CrpgP.Domain.Abstractions;
+﻿using CrpgP.Application.Result;
+using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
 using Serilog;
 
@@ -15,29 +16,62 @@ public class PortraitService
         _logger = logger;
     }
     
-    public Portrait FindPortraitById(int id)
+    public async Task<Result<Portrait>> GetPortraitById(int id)
     {
-        return _repository.GetById(id);
+        var portrait = await _repository.FindByIdAsync(id);
+        return portrait is null 
+            ? Result<Portrait>.Failure($"Portrait with id: \"{id}\" was not found.")
+            : Result<Portrait>.Success(portrait);
     }
 
-    public IEnumerable<Portrait> FindPortraitsByIds(int[] ids)
+    public async Task<Result<IEnumerable<Portrait>>> GetPortraitsByIds(int[] ids)
     {
-        return _repository.GetByIds(ids);
+        var portraits = await _repository.FindByIdsAsync(ids);
+        return portraits is null 
+            ? Result<IEnumerable<Portrait>>.Failure("Portraits not found.")
+            : Result<IEnumerable<Portrait>>.Success(portraits);
     }
 
-    public void InsertPortrait(Portrait portrait)
+    public async Task<Result<int>> CreatePortrait(Portrait portrait)
     {
-        _repository.Insert(portrait);
+        try
+        {
+            var result = await _repository.InsertAsync(portrait);
+            return Result<int>.Success(result);
+        }
+        catch (Exception e)
+        {
+            _logger.Error("Portrait create failed. {0}", e.Message);
+            return Result<int>.Failure(e.Message);
+        }
     }
 
-    public void UpdatePortrait(Portrait portrait)
+    public async Task<Result<object>> UpdatePortrait(Portrait portrait)
     {
-        _repository.Update(portrait);
+        try
+        {
+            await _repository.UpdateAsync(portrait);
+            return Result<object>.Success();
+        }
+        catch (Exception e)
+        {
+            _logger.Error("Portrait update failed. {0}", e.Message);
+            return Result<object>.Failure(e.Message);
+        }
     }
     
-    public void DeletePortrait(int id)
+    public async Task<Result<object>> DeletePortrait(int id)
     {
-        _repository.Delete(id);
+        try
+        {
+            await _repository.DeleteAsync(id);
+            return Result<object>.Success();
+        }
+        catch (Exception e)
+        {
+            _logger.Error("Portrait delete failed. {0}", e.Message);
+            return Result<object>.Failure(e.Message);
+        }
     }
 
 }

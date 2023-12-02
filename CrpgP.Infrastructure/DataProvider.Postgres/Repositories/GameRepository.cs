@@ -35,9 +35,10 @@ public class GameRepository : RepositoryBase, IGameRepository
     public async Task<int> InsertAsync(Game game)
     {
         await using var conn = await DataSource.OpenConnectionAsync();
-        const string sql = "INSERT INTO games (name) VALUES (@GameName);" +
-                           "SELECT currval('games_id_seq');";
-        return await conn.QuerySingleAsync<int>(sql, new
+        const string sql =
+            "INSERT INTO games (name) VALUES (@GameName);" +
+            "SELECT currval('games_id_seq');";
+        return await conn.QuerySingleOrDefaultAsync<int>(sql, new
         {
             GameName = game.Name
         });
@@ -46,8 +47,8 @@ public class GameRepository : RepositoryBase, IGameRepository
     public async Task UpdateAsync(Game game)
     {
         await using var conn = await DataSource.OpenConnectionAsync();
-        const string updateGamesSql = "UPDATE games SET name = @GameName WHERE id = @GameId;";
-        await conn.QueryAsync(updateGamesSql, new
+        const string sql = "UPDATE games SET name = @GameName WHERE id = @GameId;";
+        await conn.QuerySingleAsync(sql, new
         {
             GameName = game.Name,
             GameId = game.Id
@@ -58,7 +59,7 @@ public class GameRepository : RepositoryBase, IGameRepository
     {
         await using var conn = await DataSource.OpenConnectionAsync();
         const string sql = "DELETE FROM games WHERE id = @GameId;";
-        await conn.QueryFirstAsync<Game>(sql, new
+        await conn.QuerySingleAsync(sql, new
         {
             GameId = gameId
         });

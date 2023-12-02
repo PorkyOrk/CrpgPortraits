@@ -1,4 +1,5 @@
-﻿using CrpgP.Domain.Abstractions;
+﻿using CrpgP.Application.Result;
+using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
 using Serilog;
 
@@ -15,29 +16,62 @@ public class SizeService
         _logger = logger;
     }
     
-    public Size FindSizeById(int id)
+    public async Task<Result<Size>> GetSizeByIdAsync(int id)
     {
-        return _repository.GetById(id);
+        var size = await _repository.FindByIdAsync(id);
+        return size is null 
+            ? Result<Size>.Failure($"Size with id: \"{id}\" was not found.")
+            : Result<Size>.Success(size);
     }
 
-    public IEnumerable<Size> FindSizeByDimensions(int width, int height)
+    public async Task<Result<IEnumerable<Size>>> GetSizeByDimensionsAsync(int width, int height)
     {
-        return _repository.GetByDimensions(width, height);
+        var sizes = await _repository.FindByDimensionsAsync(width, height);
+        return sizes is null 
+            ? Result<IEnumerable<Size>>.Failure($"No sizes with dimensions x:{width} , y:{height} were found.")
+            : Result<IEnumerable<Size>>.Success(sizes);
     }
 
-    public void InsertSize(Size size)
+    public async Task<Result<int>> CreateSizeAsync(Size size)
     {
-        _repository.Insert(size);
+        try
+        {
+            var result = await _repository.InsertAsync(size);
+            return Result<int>.Success(result);
+        }
+        catch (Exception e)
+        {
+            _logger.Error("Size create failed. {0}", e.Message);
+            return Result<int>.Failure(e.Message);
+        }
     }
 
-    public void UpdateSize(Size size)
+    public async Task<Result<object>> UpdateSizeAsync(Size size)
     {
-        _repository.Update(size);
+        try
+        {
+            await _repository.UpdateAsync(size);
+            return Result<object>.Success();
+        }
+        catch (Exception e)
+        {
+            _logger.Error("Size update failed. {0}", e.Message);
+            return Result<object>.Failure(e.Message);
+        }
     }
     
-    public void DeleteSize(int id)
+    public async Task<Result<object>> DeleteSizeAsync(int id)
     {
-        _repository.Delete(id);
+        try
+        {
+            await _repository.DeleteAsync(id);
+            return Result<object>.Success();
+        }
+        catch (Exception e)
+        {
+            _logger.Error("Size delete failed. {0}", e.Message);
+            return Result<object>.Failure(e.Message);
+        }
     }
 
 }

@@ -4,9 +4,9 @@ namespace CrpgP.Domain.Abstractions;
 
 public interface ISizeRepository
 {
-    public Size GetById(int tagId);
-    public IEnumerable<Size> GetByDimensions(int width, int height);
-    public void Insert(Size tag);
-    public void Update(Size tag);
-    public void Delete(int tagId);
+    public Task<Size?> FindByIdAsync(int tagId);
+    public Task<IEnumerable<Size>?> FindByDimensionsAsync(int width, int height);
+    public Task<int> InsertAsync(Size tag);
+    public Task UpdateAsync(Size tag);
+    public Task DeleteAsync(int tagId);
 }

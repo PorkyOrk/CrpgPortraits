@@ -19,18 +19,16 @@ public class GameService
     public async Task<Result<Game>> GetGameByIdAsync(int id)
     {
         var game = await _repository.FindByIdAsync(id);
-        
         return game is null 
-            ? Result<Game>.Failure($"Game with the id: {id} was not found")
+            ? Result<Game>.Failure($"Game with id: \"{id}\" was not found.")
             : Result<Game>.Success(game);
     }
     
     public async Task<Result<Game>> GetGameByNameAsync(string name)
     {
         var game = await _repository.FindByNameAsync(name);
-
         return game is null
-            ? Result<Game>.Failure($"Game with the name: {name} was not found")
+            ? Result<Game>.Failure($"Game with name: \"{name}\" was not found.")
             : Result<Game>.Success(game);
     }
     
@@ -43,11 +41,11 @@ public class GameService
         }
         catch (Exception e)
         {
-            _logger.Error("Game creation failed. {0}", e.Message);
+            _logger.Error("Game create failed. {0}", e.Message);
             return Result<int>.Failure(e.Message);
         }
     }
-
+    
     public async Task<Result<object>> UpdateGameAsync(Game game)
     {
         try
@@ -61,7 +59,7 @@ public class GameService
             return Result<object>.Failure(e.Message);
         }
     }
-
+    
     public async Task<Result<object>> DeleteGameAsync(int id)
     {
         try

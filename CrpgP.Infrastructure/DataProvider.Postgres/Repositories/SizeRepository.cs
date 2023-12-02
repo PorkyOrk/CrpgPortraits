@@ -1,7 +1,7 @@
 ﻿using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
 using CrpgP.Infrastructure.DataProvider.Postgres.Abstractions;
-using Microsoft.Extensions.Configuration;
+using Dapper;
 using Npgsql;
 
 namespace CrpgP.Infrastructure.DataProvider.Postgres.Repositories;
@@ -12,28 +12,59 @@ public class SizeRepository : RepositoryBase, ISizeRepository
     {
     }
 
-    public Size GetById(int tagId)
+    public async Task<Size?> FindByIdAsync(int sizeId)
     {
-        throw new NotImplementedException();
+        await using var cnn = await DataSource.OpenConnectionAsync();
+        const string sql = "SELECT * FROM sizes WHERE id = @SizeId;";
+        return await cnn.QueryFirstOrDefaultAsync<Size>(sql, new
+        {
+            SizeId = sizeId
+        });
     }
 
-    public IEnumerable<Size> GetByDimensions(int width, int height)
+    public async Task<IEnumerable<Size>?> FindByDimensionsAsync(int width, int height)
     {
-        throw new NotImplementedException();
+        await using var cnn = await DataSource.OpenConnectionAsync();
+        const string sql = "SELECT * FROM sizes WHERE width = @Width AND height = @Height ORDER BY width;";
+        return await cnn.QueryAsync<Size>(sql, new
+        {
+            width,
+            height
+        });
     }
 
-    public void Insert(Size size)
+    public async Task<int> InsertAsync(Size size)
     {
-        throw new NotImplementedException();
+        await using var conn = await DataSource.OpenConnectionAsync();
+        const string sql =
+            "INSERT INTO sizes (width, height) VALUES (@Width, @Height);" +
+            "SELECT currval('sizes_id_seq');";
+        return await conn.QuerySingleOrDefaultAsync<int>(sql, new
+        {
+            size.Width,
+            size.Height
+        });
     }
 
-    public void Update(Size size)
+    public async Task UpdateAsync(Size size)
     {
-        throw new NotImplementedException();
+        await using var conn = await DataSource.OpenConnectionAsync();
+        const string sql = "UPDATE sizes SET width = @Width, height = @Height WHERE id = @SizeId;";
+        await conn.QuerySingleAsync(sql, new
+        {
+            size.Width,
+            size.Height,
+            SizeId = size.Id
+        });
     }
 
-    public void Delete(int sizeId)
+    public async Task DeleteAsync(int sizeId)
     {
-        throw new NotImplementedException();
+        await using var conn = await DataSource.OpenConnectionAsync();
+        const string sql = "DELETE FROM sizes WHERE id = @SizeId;";
+        await conn.QuerySingleAsync(sql, new
+        {
+            SizeId = sizeId
+        });
     }
 }
