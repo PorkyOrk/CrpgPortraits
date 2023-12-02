@@ -32,10 +32,11 @@ public class PortraitService
             : Result<IEnumerable<Portrait>>.Success(portraits);
     }
 
-    public async Task<Result<int>> CreatePortrait(Portrait portrait)
+    public async Task<Result<int>> CreatePortrait(string json)
     {
         try
         {
+            var portrait = Validation.Mapper.MapToType<Portrait>(json);
             var result = await _repository.InsertAsync(portrait);
             return Result<int>.Success(result);
         }
@@ -46,10 +47,11 @@ public class PortraitService
         }
     }
 
-    public async Task<Result<object>> UpdatePortrait(Portrait portrait)
+    public async Task<Result<object>> UpdatePortrait(string json)
     {
         try
         {
+            var portrait = Validation.Mapper.MapToType<Portrait>(json);
             await _repository.UpdateAsync(portrait);
             return Result<object>.Success();
         }

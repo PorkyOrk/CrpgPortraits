@@ -3,21 +3,8 @@ using CrpgP.Application.Exceptions;
 
 namespace CrpgP.Application.Validation;
 
-
-public static class Validation
+public static class Mapper
 {
-    public static void RequestInput(string? payload)
-    {
-        // Check for empty payload
-        if (string.IsNullOrWhiteSpace(payload))
-        {
-            throw new PayloadEmptyException("Empty payload.");
-        }
-
-        
-        // Note: Add more validation here...
-    }
-    
     public static T MapToType<T>(string json)
     {
         var result = JsonSerializer.Deserialize<T>(json, JsonSerializerOptions.Default);

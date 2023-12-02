@@ -1,4 +1,5 @@
 ﻿using CrpgP.Application;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CrpgP.WebApi.Endpoints;
 
@@ -7,32 +8,36 @@ public static class TagEndpoints
     public static void MapTagEndpoints(this WebApplication app)
     {
         var tagService = app.Services.GetService<TagService>()
-            ?? throw new NullReferenceException("Unable to find Tag Service.");
+            ?? throw new NullReferenceException($"Unable to find {nameof(TagService)}.");
         
-        app.MapGet("api/v1/tag/{id}", async Task<IResult>(int id) =>
+        
+        app.MapGet("api/v1/tag", async Task<IResult>(
+            [FromQuery(Name = "id")] int id) =>
         {
-            // Not implemented
-            return Results.NotFound();
+            var result = await tagService.GetTagByIdAsync(id);
+            return Results.Json(result);
+        });
+        
+        app.MapGet("api/v1/tag/find", async Task<IResult>(
+            [FromQuery(Name = "name")] string name) =>
+        {
+            var result = await tagService.GetTagByNameAsync(name);
+            return Results.Json(result);
         });
 
-        app.MapPost("api/v1/tag/create/", async Task<IResult>(HttpRequest request) =>
+        app.MapPost("api/v1/tag/create", async Task<IResult>(
+            HttpRequest request) =>
         {
-            // Not implemented
-            var body = await new StreamReader(request.Body).ReadToEndAsync();
-            return Results.NotFound();
+            var jsonBody =  await new StreamReader(request.Body).ReadToEndAsync();
+            var result = await tagService.CreateTagAsync(jsonBody);
+            return Results.Json(result);
         });
         
-        app.MapPut("api/v1/tag/update/", async Task<IResult> (HttpContext context) =>
+        app.MapDelete("api/v1/tag/delete", async Task<IResult>(
+            [FromQuery(Name = "id")] int id) =>
         {
-            // Not implemented
-            var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
-            return Results.NotFound();
-        });
-        
-        app.MapDelete("api/v1/tag/delete/{id}", async Task<IResult>(int id) =>
-        {
-            // Not implemented
-            return Results.NotFound();
+            var result = await tagService.DeleteTagAsync(id);
+            return Results.Json(result);
         });
     }
 }

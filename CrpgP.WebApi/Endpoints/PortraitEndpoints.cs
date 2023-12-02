@@ -1,4 +1,5 @@
 ﻿using CrpgP.Application;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CrpgP.WebApi.Endpoints;
 
@@ -7,32 +8,44 @@ public static class PortraitEndpoints
     public static void MapPortraitEndpoints(this WebApplication app)
     {
         var portraitService = app.Services.GetService<PortraitService>()
-            ?? throw new NullReferenceException("Unable to find Portrait Service.");
+            ?? throw new NullReferenceException($"Unable to find {nameof(PortraitService)}.");
         
-        app.MapGet("api/v1/portrait/{id}", async Task<IResult>(int id) =>
+        
+        app.MapGet("api/v1/portrait", async Task<IResult>(
+            [FromQuery(Name="id")] int id) =>
         {
-            // Not implemented
-            return Results.NotFound();
+            var result = await portraitService.GetPortraitById(id);
+            return Results.Json(result);
+        });
+        
+        app.MapGet("api/v1/portraits", async Task<IResult>(
+            [FromQuery(Name="id")] int[] ids) =>
+        {
+            var result = await portraitService.GetPortraitsByIds(ids);
+            return Results.Json(result);
         });
 
-        app.MapPost("api/v1/portrait/create/", async Task<IResult>(HttpRequest request) =>
+        app.MapPost("api/v1/portrait/create", async Task<IResult>(
+            HttpRequest request) =>
         {
-            // Not implemented
-            var body = await new StreamReader(request.Body).ReadToEndAsync();
-            return Results.NotFound();
+            var jsonBody = await new StreamReader(request.Body).ReadToEndAsync();
+            var result = await portraitService.CreatePortrait(jsonBody);
+            return Results.Json(result);
         });
         
-        app.MapPut("api/v1/portrait/update/", async Task<IResult> (HttpContext context) =>
+        app.MapPut("api/v1/portrait/update", async Task<IResult>(
+            HttpRequest request) =>
         {
-            // Not implemented
-            var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
-            return Results.NotFound();
+            var jsonBody = await new StreamReader(request.Body).ReadToEndAsync();
+            var result = await portraitService.UpdatePortrait(jsonBody);
+            return Results.Json(result);
         });
         
-        app.MapDelete("api/v1/portrait/delete/{id}", async Task<IResult>(int id) =>
+        app.MapDelete("api/v1/portrait/delete", async Task<IResult>(
+            [FromQuery(Name="id")] int id) =>
         {
-            // Not implemented
-            return Results.NotFound();
+            var result = await portraitService.DeletePortrait(id);
+            return Results.Json(result);
         });
     }
 }

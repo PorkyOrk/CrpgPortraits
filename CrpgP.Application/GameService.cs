@@ -32,10 +32,11 @@ public class GameService
             : Result<Game>.Success(game);
     }
     
-    public async Task<Result<int>> CreateGameAsync(Game game)
+    public async Task<Result<int>> CreateGameAsync(string json)
     {
         try
         {
+            var game = Validation.Mapper.MapToType<Game>(json);
             var result = await _repository.InsertAsync(game);
             return Result<int>.Success(result);
         }
@@ -46,10 +47,11 @@ public class GameService
         }
     }
     
-    public async Task<Result<object>> UpdateGameAsync(Game game)
+    public async Task<Result<object>> UpdateGameAsync(string json)
     {
         try
         {
+            var game = Validation.Mapper.MapToType<Game>(json);
             await _repository.UpdateAsync(game);
             return Result<object>.Success();
         }

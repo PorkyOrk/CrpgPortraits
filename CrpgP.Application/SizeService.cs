@@ -32,10 +32,11 @@ public class SizeService
             : Result<IEnumerable<Size>>.Success(sizes);
     }
 
-    public async Task<Result<int>> CreateSizeAsync(Size size)
+    public async Task<Result<int>> CreateSizeAsync(string json)
     {
         try
         {
+            var size = Validation.Mapper.MapToType<Size>(json);
             var result = await _repository.InsertAsync(size);
             return Result<int>.Success(result);
         }
@@ -46,10 +47,11 @@ public class SizeService
         }
     }
 
-    public async Task<Result<object>> UpdateSizeAsync(Size size)
+    public async Task<Result<object>> UpdateSizeAsync(string json)
     {
         try
         {
+            var size = Validation.Mapper.MapToType<Size>(json);
             await _repository.UpdateAsync(size);
             return Result<object>.Success();
         }

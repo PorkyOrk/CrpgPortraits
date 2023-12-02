@@ -32,10 +32,11 @@ public class TagService
             : Result<Tag>.Success(tag);
     }
     
-    public async Task<Result<int>> CreateTagAsync(Tag tag)
+    public async Task<Result<int>> CreateTagAsync(string json)
     {
         try
         {
+            var tag = Validation.Mapper.MapToType<Tag>(json);
             var result = await _repository.InsertAsync(tag);
             _logger.Information("New tag created. id: {0}", tag.Id);
             return Result<int>.Success(result);
