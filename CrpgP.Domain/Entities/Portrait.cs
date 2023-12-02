@@ -3,12 +3,12 @@
 public class Portrait
 {
     public int Id { get; init; }
-    public string FileName { get; set; }
+    public required string FileName { get; set; }
+    public required Size Size { get; set; }
     public string? DisplayName { get; set; }
     public string? Description { get; set; }
     
-    public Size Size { get; set; }
-    public Tag[] Tags { get; set; }
+    public Tag[] Tags { get; set; } = Array.Empty<Tag>();
     public DateTime Created { get; }
 
     public Portrait()

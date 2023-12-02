@@ -20,7 +20,7 @@ public class TagService
     {
         var tag = await _repository.FindByIdAsync(id);
         return tag is null 
-            ? Result<Tag>.Failure($"Tag with id: \"{id}\" was not found.")
+            ? Result<Tag>.Failure($"Tag with id: {id} was not found.")
             : Result<Tag>.Success(tag);
     }
     
@@ -28,7 +28,7 @@ public class TagService
     {
         var tag = await _repository.FindByNameAsync(name);
         return tag is null
-            ? Result<Tag>.Failure($"Tag with name: \"{name}\" was not found.")
+            ? Result<Tag>.Failure($"Tag with name: {name} was not found.")
             : Result<Tag>.Success(tag);
     }
     

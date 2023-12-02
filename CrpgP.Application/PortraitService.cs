@@ -20,7 +20,7 @@ public class PortraitService
     {
         var portrait = await _repository.FindByIdAsync(id);
         return portrait is null 
-            ? Result<Portrait>.Failure($"Portrait with id: \"{id}\" was not found.")
+            ? Result<Portrait>.Failure($"Portrait with id: {id} was not found.")
             : Result<Portrait>.Success(portrait);
     }
 

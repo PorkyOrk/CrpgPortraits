@@ -20,7 +20,7 @@ public class SizeService
     {
         var size = await _repository.FindByIdAsync(id);
         return size is null 
-            ? Result<Size>.Failure($"Size with id: \"{id}\" was not found.")
+            ? Result<Size>.Failure($"Size with id: {id} was not found.")
             : Result<Size>.Success(size);
     }
 

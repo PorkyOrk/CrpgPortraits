@@ -20,7 +20,7 @@ public class GameService
     {
         var game = await _repository.FindByIdAsync(id);
         return game is null 
-            ? Result<Game>.Failure($"Game with id: \"{id}\" was not found.")
+            ? Result<Game>.Failure($"Game with id: {id} was not found.")
             : Result<Game>.Success(game);
     }
     
@@ -28,7 +28,7 @@ public class GameService
     {
         var game = await _repository.FindByNameAsync(name);
         return game is null
-            ? Result<Game>.Failure($"Game with name: \"{name}\" was not found.")
+            ? Result<Game>.Failure($"Game with name: {name} was not found.")
             : Result<Game>.Success(game);
     }
     

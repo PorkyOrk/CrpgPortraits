@@ -3,8 +3,8 @@
 public class Game
 {
     public int Id { get; init; }
-    public string Name { get; init; }
-    public Size PortraitSize { get; set; }
+    public required string Name { get; init; }
+    public required Size PortraitSize { get; set; }
 
     public Game()
     {
