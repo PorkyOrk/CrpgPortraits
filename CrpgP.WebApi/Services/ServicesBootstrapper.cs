@@ -15,7 +15,9 @@ public static class ServicesBootstrapper
             ?? throw new InvalidOperationException("Missing connection string"));
         
         // Health Check
+        serviceCollection.AddSingleton<IHealthCheckRepository, HealthCheckRepository>();
         serviceCollection.AddHealthChecks().AddCheck<HealthCheck>("HealthCheck");
+
         
         // Swagger
         serviceCollection.AddEndpointsApiExplorer();

@@ -1,13 +1,19 @@
-﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+﻿using CrpgP.Domain.Abstractions;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace CrpgP.Application.Health;
 
 public class HealthCheck : IHealthCheck
 {
+    private readonly IHealthCheckRepository _repository;
+    
+    public HealthCheck(IHealthCheckRepository repository)
+    {
+        _repository = repository;
+    }
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
-        var status = new DbStatus();
-        var isHealthy = await status.IsHealthy();
+        var isHealthy = await _repository.HaveConnectivity();
         
         if (isHealthy)
         {
