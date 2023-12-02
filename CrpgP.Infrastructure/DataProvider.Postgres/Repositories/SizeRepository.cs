@@ -6,7 +6,7 @@ using Npgsql;
 
 namespace CrpgP.Infrastructure.DataProvider.Postgres.Repositories;
 
-public class SizeRepository : Repository, ISizeRepository
+public class SizeRepository : RepositoryBase, ISizeRepository
 {
     public SizeRepository(NpgsqlDataSource dataSource) : base(dataSource)
     {

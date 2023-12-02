@@ -8,10 +8,6 @@ public static class EndpointsSetup
         app.MapPortraitEndpoints();
         app.MapSizeEndpoints();
         app.MapTagEndpoints();
-        
-        
-        // Health check 
         app.MapHealthChecks("/health");
-        
     }
 }

@@ -1,4 +1,5 @@
 ﻿using CrpgP.Application;
+using CrpgP.Domain.Entities;
 
 namespace CrpgP.WebApi.Endpoints;
 
@@ -7,8 +8,7 @@ public static class GameEndpoints
     public static void MapGameEndpoints(this WebApplication app)
     {
         var gameService = app.Services.GetService<GameService>()
-            ?? throw new NullReferenceException("Unable to find Game Service.");
-        
+            ?? throw new NullReferenceException("Unable to find GameService.");
         
         app.MapGet("api/v1/game/{id}", async Task<IResult>(int id) =>
         {
@@ -25,15 +25,21 @@ public static class GameEndpoints
         
         app.MapPost("api/v1/game/create/", async Task<IResult>(HttpRequest request) =>
         {
-            var body = await new StreamReader(request.Body).ReadToEndAsync();
-            var result = await gameService.CreateGameAsync(body);
+            var game = await request.ReadFromJsonAsync<Game>();
+            if (game is null)
+                return Results.BadRequest("Invalid payload.");
+            
+            var result = await gameService.CreateGameAsync(game);
             return Results.Json(result);
         });
         
-        app.MapPut("api/v1/game/update/", async Task<IResult> (HttpContext context) =>
+        app.MapPut("api/v1/game/update/", async Task<IResult> (HttpRequest request) =>
         {
-            var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
-            var result = await gameService.UpdateGameAsync(body);
+            var game = await request.ReadFromJsonAsync<Game>();
+            if (game is null)
+                return Results.BadRequest("Invalid payload.");
+            
+            var result = await gameService.UpdateGameAsync(game);
             return Results.Json(result);
         });
         

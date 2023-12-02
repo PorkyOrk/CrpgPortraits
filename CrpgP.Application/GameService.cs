@@ -34,11 +34,8 @@ public class GameService
             : Result<Game>.Success(game);
     }
     
-    public async Task<Result<int>> CreateGameAsync(string payload)
+    public async Task<Result<int>> CreateGameAsync(Game game)
     {
-        Validation.Validation.RequestInput(payload);
-        var game = Validation.Validation.MapToType<Game>(payload);
-
         try
         {
             var result = await _repository.InsertAsync(game);
@@ -51,11 +48,8 @@ public class GameService
         }
     }
 
-    public async Task<Result<object>> UpdateGameAsync(string payload)
+    public async Task<Result<object>> UpdateGameAsync(Game game)
     {
-        Validation.Validation.RequestInput(payload);
-        var game = Validation.Validation.MapToType<Game>(payload);
-
         try
         {
             await _repository.UpdateAsync(game);

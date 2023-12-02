@@ -6,7 +6,7 @@ using Npgsql;
 
 namespace CrpgP.Infrastructure.DataProvider.Postgres.Repositories;
 
-public class TagRepository : Repository, ITagRepository
+public class TagRepository : RepositoryBase, ITagRepository
 {
 
     public TagRepository(NpgsqlDataSource dataSource) : base(dataSource) 

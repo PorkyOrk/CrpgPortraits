@@ -2,11 +2,11 @@
 
 namespace CrpgP.Infrastructure.DataProvider.Postgres.Abstractions;
 
-public abstract class Repository
+public abstract class RepositoryBase
 {
     protected readonly NpgsqlDataSource DataSource;
     
-    protected Repository(NpgsqlDataSource dataSource)
+    protected RepositoryBase(NpgsqlDataSource dataSource)
     {
         DataSource = dataSource;
     }

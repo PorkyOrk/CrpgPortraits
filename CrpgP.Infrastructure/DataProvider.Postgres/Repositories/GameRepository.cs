@@ -6,7 +6,7 @@ using Npgsql;
 
 namespace CrpgP.Infrastructure.DataProvider.Postgres.Repositories;
 
-public class GameRepository : Repository, IGameRepository
+public class GameRepository : RepositoryBase, IGameRepository
 {
     public GameRepository(NpgsqlDataSource dataSource) : base(dataSource)
     {

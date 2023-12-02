@@ -5,7 +5,7 @@ using Npgsql;
 
 namespace CrpgP.Infrastructure.DataProvider.Postgres.Repositories;
 
-public class PortraitRepository : Repository, IPortraitRepository
+public class PortraitRepository : RepositoryBase, IPortraitRepository
 {
     public PortraitRepository(NpgsqlDataSource dataSource) : base(dataSource)
     {

@@ -5,7 +5,7 @@ using Npgsql;
 
 namespace CrpgP.Infrastructure.DataProvider.Postgres.Repositories;
 
-public class HealthCheckRepository : Repository, IHealthCheckRepository
+public class HealthCheckRepository : RepositoryBase, IHealthCheckRepository
 {
     public HealthCheckRepository(NpgsqlDataSource dataSource) : base(dataSource)
     {

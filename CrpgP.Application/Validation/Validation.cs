@@ -4,8 +4,6 @@ using CrpgP.Application.Exceptions;
 namespace CrpgP.Application.Validation;
 
 
-// Todo refactor the validation
-
 public static class Validation
 {
     public static void RequestInput(string? payload)
