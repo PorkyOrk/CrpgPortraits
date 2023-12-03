@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace CrpgP.Domain.Entities;
+﻿namespace CrpgP.Domain.Entities;
 
 public class Portrait
 {

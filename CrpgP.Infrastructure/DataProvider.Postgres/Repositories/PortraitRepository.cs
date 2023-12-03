@@ -56,7 +56,7 @@ public class PortraitRepository : RepositoryBase, IPortraitRepository
     {
         await using var cnn = await DataSource.OpenConnectionAsync();
         const string sql =
-            "INSERT INTO portraits (file_name, display_name, description, date_created, size_id) " +
+            "INSERT INTO portraits (file_name, display_name, description, created, size_id) " +
             "VALUES (@FileName, @DisplayName, @Description, @Created, @SizeId);" +
             "SELECT currval('portraits_id_seq');";
         var id = cnn.QueryAsync<int>(sql, new {
@@ -79,14 +79,15 @@ public class PortraitRepository : RepositoryBase, IPortraitRepository
         await using var cnn = await DataSource.OpenConnectionAsync();
         const string sql =
             "UPDATE portraits " +
-            "SET file_name = @FileName, display_name = @DisplayName, description = @Description, date_created = @Created, size_id = @SizeId " +
+            "SET file_name = @FileName, display_name = @DisplayName, description = @Description, created = @Created, size_id = @SizeId " +
             "WHERE id = @PortraitId;";
         await cnn.QueryAsync(sql, new {
             portrait.FileName,
             portrait.DisplayName,
             portrait.Description,
             portrait.Created,
-            SizeId = portrait.Size.Id
+            SizeId = portrait.Size.Id,
+            PortraitId = portrait.Id
         });
         
         await UpdatePortraitTags(cnn, portrait.Id, portrait.Tags.Select(t => t.Id));
