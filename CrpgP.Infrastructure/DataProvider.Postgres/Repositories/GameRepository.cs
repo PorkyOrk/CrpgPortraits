@@ -67,12 +67,12 @@ public class GameRepository : RepositoryBase, IGameRepository
     
     public async Task<int> InsertAsync(Game game)
     {
-        await using var conn = await DataSource.OpenConnectionAsync();
+        await using var cnn = await DataSource.OpenConnectionAsync();
         const string sql =
             "INSERT INTO games (name, size_id) VALUES (@GameName, @SizeId);" +
             "SELECT currval('games_id_seq');";
         
-        var id = conn.QueryAsync<int>(sql, new {
+        var id = cnn.QueryAsync<int>(sql, new {
                 GameName = game.Name,
                 SizeId = game.PortraitSize.Id
             })
@@ -80,39 +80,37 @@ public class GameRepository : RepositoryBase, IGameRepository
             .GetResult()
             .FirstOrDefault();
 
-        await InsertGameTags(conn, id, game.Tags.Select(t => t.Id));
+        await InsertGameTags(cnn, id, game.Tags.Select(t => t.Id));
 
         return id;
     }
     
     public async Task UpdateAsync(Game game)
     {
-        await using var conn = await DataSource.OpenConnectionAsync();
+        await using var cnn = await DataSource.OpenConnectionAsync();
         const string sql = 
             "UPDATE games " +
             "SET name = @GameName, size_id = @SizeId " +
             "WHERE id = @GameId;";
         
-        await conn.QueryAsync(sql, new {
+        await cnn.QueryAsync(sql, new {
             GameName = game.Name,
             SizeId = game.PortraitSize.Id,
             GameId = game.Id,
         });
 
-        await UpdateGameTags(conn, game.Id, game.Tags.Select(t => t.Id));
+        await UpdateGameTags(cnn, game.Id, game.Tags.Select(t => t.Id));
     }
 
     public async Task DeleteAsync(int gameId)
     {
-        await using var conn = await DataSource.OpenConnectionAsync();
+        await using var cnn = await DataSource.OpenConnectionAsync();
         const string sql = "DELETE FROM games WHERE id = @GameId;";
-        await conn.QueryAsync(sql, new {
+        await cnn.QueryAsync(sql, new {
             GameId = gameId
         });
-        await DeleteAllGameTags(conn, gameId);
+        await DeleteAllGameTags(cnn, gameId);
     }
-
-    
     
     
     // Game Tags
@@ -120,7 +118,7 @@ public class GameRepository : RepositoryBase, IGameRepository
     private static async Task<IEnumerable<Tag>> FindGameTags(IDbConnection cnn, int gameId)
     {
         const string sql =
-            "SELECT name FROM tags " +
+            "SELECT * FROM tags " +
             "WHERE id IN ( " +
             "SELECT tag_id FROM tag_game " +
             "WHERE tag_game.game_id = @GameId);";

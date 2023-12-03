@@ -5,7 +5,7 @@ public class Game
     public int Id { get; init; }
     public required string Name { get; init; }
     public required Size PortraitSize { get; set; }
-    public IEnumerable<Tag> Tags { get; set; }
+    public IEnumerable<Tag> Tags { get; set; } = new List<Tag>();
 
     public Game()
     {

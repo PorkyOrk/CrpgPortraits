@@ -32,20 +32,20 @@ public class TagRepository : RepositoryBase, ITagRepository
 
     public async Task<int> InsertAsync(Tag tag)
     {
-        await using var conn = await DataSource.OpenConnectionAsync();
+        await using var cnn = await DataSource.OpenConnectionAsync();
         const string sql =
             "INSERT INTO tags (name) VALUES (@TagName);" +
             "SELECT currval('tags_id_seq');";
-        return await conn.QuerySingleOrDefaultAsync<int>(sql, new {
+        return await cnn.QuerySingleOrDefaultAsync<int>(sql, new {
             TagName = tag.Name
         });
     }
     
     public async Task DeleteAsync(int tagId)
     {
-        await using var conn = await DataSource.OpenConnectionAsync();
+        await using var cnn = await DataSource.OpenConnectionAsync();
         const string sql = "DELETE FROM tags WHERE id = @TagId;";
-        await conn.QuerySingleAsync(sql, new {
+        await cnn.QuerySingleAsync(sql, new {
             TageId = tagId
         });
     }

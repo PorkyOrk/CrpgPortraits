@@ -24,12 +24,10 @@ public class PortraitService
             : Result<Portrait>.Success(portrait);
     }
 
-    public async Task<Result<IEnumerable<Portrait>>> GetPortraitsByIds(int[] ids)
+    public async Task<Result<Dictionary<int,Portrait?>>> GetPortraitsByIds(int[] ids)
     {
         var portraits = await _repository.FindByIdsAsync(ids);
-        return portraits is null 
-            ? Result<IEnumerable<Portrait>>.Failure("Portraits not found.")
-            : Result<IEnumerable<Portrait>>.Success(portraits);
+        return Result<Dictionary<int,Portrait?>>.Success(portraits);
     }
 
     public async Task<Result<int>> CreatePortrait(string json)
