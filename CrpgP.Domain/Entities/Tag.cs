@@ -4,6 +4,10 @@ public class Tag
 {
     public int Id { get; init; }
     public required string Name { get; set;}
+
+    public Tag()
+    {
+    }
     
     public Tag(string name)
     {

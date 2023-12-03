@@ -55,7 +55,7 @@ public class TagRepository : RepositoryBase, ITagRepository
         await using var cnn = await DataSource.OpenConnectionAsync();
         const string sql = "DELETE FROM tags WHERE id = @TagId;";
         await cnn.QueryAsync(sql, new {
-            TageId = tagId
+            TagId = tagId
         });
     }
 }
