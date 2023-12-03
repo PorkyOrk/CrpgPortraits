@@ -8,7 +8,6 @@ namespace CrpgP.Infrastructure.DataProvider.Postgres.Repositories;
 
 public class TagRepository : RepositoryBase, ITagRepository
 {
-
     public TagRepository(NpgsqlDataSource dataSource) : base(dataSource) 
     {
     }
@@ -17,8 +16,7 @@ public class TagRepository : RepositoryBase, ITagRepository
     {
         await using var cnn = await DataSource.OpenConnectionAsync();
         const string sql = "SELECT * FROM tags WHERE id = @TagId;";
-        return await cnn.QueryFirstOrDefaultAsync<Tag>(sql, new
-        {
+        return await cnn.QueryFirstOrDefaultAsync<Tag>(sql, new {
             TagId = tagId
         });
     }
@@ -27,8 +25,7 @@ public class TagRepository : RepositoryBase, ITagRepository
     {
         await using var cnn = await DataSource.OpenConnectionAsync();
         const string sql = "SELECT * FROM tags WHERE name = @TagName;";
-        return await cnn.QueryFirstOrDefaultAsync<Tag>(sql, new
-        {
+        return await cnn.QueryFirstOrDefaultAsync<Tag>(sql, new {
             TagName = tagName
         });
     }
@@ -39,8 +36,7 @@ public class TagRepository : RepositoryBase, ITagRepository
         const string sql =
             "INSERT INTO tags (name) VALUES (@TagName);" +
             "SELECT currval('tags_id_seq');";
-        return await conn.QuerySingleOrDefaultAsync<int>(sql, new
-        {
+        return await conn.QuerySingleOrDefaultAsync<int>(sql, new {
             TagName = tag.Name
         });
     }
@@ -49,8 +45,7 @@ public class TagRepository : RepositoryBase, ITagRepository
     {
         await using var conn = await DataSource.OpenConnectionAsync();
         const string sql = "DELETE FROM tags WHERE id = @TagId;";
-        await conn.QuerySingleAsync(sql, new
-        {
+        await conn.QuerySingleAsync(sql, new {
             TageId = tagId
         });
     }

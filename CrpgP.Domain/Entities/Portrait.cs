@@ -7,15 +7,14 @@ public class Portrait
     public required Size Size { get; set; }
     public string? DisplayName { get; set; }
     public string? Description { get; set; }
-    
-    public Tag[] Tags { get; set; } = Array.Empty<Tag>();
+    public Tag[]? Tags { get; set; }
     public DateTime Created { get; }
 
     public Portrait()
     {
     }
     
-    public Portrait(string fileName, string? displayName, string? description, Size size, DateTime created, Tag[] tags)
+    public Portrait(string fileName, string? displayName, string? description, Size size, DateTime created, Tag[]? tags)
     {
         FileName = fileName;
         Size = size;
@@ -25,7 +24,7 @@ public class Portrait
         Created = created;
     }
 
-    public Portrait(int id, string fileName, string? displayName, string? description, Size size, DateTime created, Tag[] tags)
+    public Portrait(int id, string fileName, string? displayName, string? description, Size size, DateTime created, Tag[]? tags)
     {
         Id = id;
         FileName = fileName;

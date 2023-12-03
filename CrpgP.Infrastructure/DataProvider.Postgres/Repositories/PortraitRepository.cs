@@ -16,8 +16,7 @@ public class PortraitRepository : RepositoryBase, IPortraitRepository
     {
         await using var cnn = await DataSource.OpenConnectionAsync();
         const string sql = "SELECT * FROM portraits WHERE id = @PortraitId;";
-        return await cnn.QueryFirstOrDefaultAsync<Portrait>(sql, new
-        {
+        return await cnn.QueryFirstOrDefaultAsync<Portrait>(sql, new {
             PortraitId = portraitId
         });
     }
@@ -26,8 +25,7 @@ public class PortraitRepository : RepositoryBase, IPortraitRepository
     {
         await using var cnn = await DataSource.OpenConnectionAsync();
         const string sql = "SELECT * FROM portraits WHERE id IN @PortraitIds;";
-        return await cnn.QueryAsync<Portrait>(sql, new
-        {
+        return await cnn.QueryAsync<Portrait>(sql, new {
             PortraitIds = portraitIds
         });
     }
@@ -39,8 +37,7 @@ public class PortraitRepository : RepositoryBase, IPortraitRepository
             "INSERT INTO portraits (file_name, display_name, description, date_created) " +
             "VALUES (@File_name, @Display_name, @Description, @Date_created);" +
             "SELECT currval('portraits_id_seq');";
-        return await conn.QuerySingleOrDefaultAsync<int>(sql, new
-        {
+        return await conn.QuerySingleOrDefaultAsync<int>(sql, new {
             File_name = portrait.FileName,
             Display_name = portrait.DisplayName,
             Description = portrait.Description,
@@ -55,8 +52,7 @@ public class PortraitRepository : RepositoryBase, IPortraitRepository
             "UPDATE portraits " +
             "SET file_name = @File_name, display_name = @Display_name, description = @Description, date_created = @Date_created " +
             "WHERE id = @PortraitId;";
-        await conn.QuerySingleAsync(sql, new
-        {
+        await conn.QuerySingleAsync(sql, new {
             File_name = portrait.FileName,
             Display_name = portrait.DisplayName,
             Description = portrait.Description,
@@ -68,8 +64,7 @@ public class PortraitRepository : RepositoryBase, IPortraitRepository
     {
         await using var conn = await DataSource.OpenConnectionAsync();
         const string sql = "DELETE FROM portraits WHERE id = @PortraitId;";
-        await conn.QuerySingleAsync(sql, new
-        {
+        await conn.QuerySingleAsync(sql, new {
             PortraitId = portraitId
         });
     }

@@ -16,8 +16,7 @@ public class SizeRepository : RepositoryBase, ISizeRepository
     {
         await using var cnn = await DataSource.OpenConnectionAsync();
         const string sql = "SELECT * FROM sizes WHERE id = @SizeId;";
-        return await cnn.QueryFirstOrDefaultAsync<Size>(sql, new
-        {
+        return await cnn.QueryFirstOrDefaultAsync<Size>(sql, new {
             SizeId = sizeId
         });
     }
@@ -26,8 +25,7 @@ public class SizeRepository : RepositoryBase, ISizeRepository
     {
         await using var cnn = await DataSource.OpenConnectionAsync();
         const string sql = "SELECT * FROM sizes WHERE width = @Width AND height = @Height ORDER BY width;";
-        return await cnn.QueryAsync<Size>(sql, new
-        {
+        return await cnn.QueryAsync<Size>(sql, new {
             width,
             height
         });
@@ -39,8 +37,7 @@ public class SizeRepository : RepositoryBase, ISizeRepository
         const string sql =
             "INSERT INTO sizes (width, height) VALUES (@Width, @Height);" +
             "SELECT currval('sizes_id_seq');";
-        return await conn.QuerySingleOrDefaultAsync<int>(sql, new
-        {
+        return await conn.QuerySingleOrDefaultAsync<int>(sql, new {
             size.Width,
             size.Height
         });
@@ -50,8 +47,7 @@ public class SizeRepository : RepositoryBase, ISizeRepository
     {
         await using var conn = await DataSource.OpenConnectionAsync();
         const string sql = "UPDATE sizes SET width = @Width, height = @Height WHERE id = @SizeId;";
-        await conn.QuerySingleAsync(sql, new
-        {
+        await conn.QuerySingleAsync(sql, new {
             size.Width,
             size.Height,
             SizeId = size.Id
@@ -62,8 +58,7 @@ public class SizeRepository : RepositoryBase, ISizeRepository
     {
         await using var conn = await DataSource.OpenConnectionAsync();
         const string sql = "DELETE FROM sizes WHERE id = @SizeId;";
-        await conn.QuerySingleAsync(sql, new
-        {
+        await conn.QuerySingleAsync(sql, new {
             SizeId = sizeId
         });
     }
