@@ -16,9 +16,12 @@ public class SizeRepository : RepositoryBase, ISizeRepository
     {
         await using var cnn = await DataSource.OpenConnectionAsync();
         const string sql = "SELECT * FROM sizes WHERE id = @SizeId;";
-        return await cnn.QueryFirstOrDefaultAsync<Size>(sql, new {
+        return cnn.QueryAsync<Size>(sql, new {
             SizeId = sizeId
-        });
+        })
+            .GetAwaiter()
+            .GetResult()
+            .FirstOrDefault();
     }
 
     public async Task<IEnumerable<Size>?> FindByDimensionsAsync(int width, int height)
@@ -37,17 +40,20 @@ public class SizeRepository : RepositoryBase, ISizeRepository
         const string sql =
             "INSERT INTO sizes (width, height) VALUES (@Width, @Height);" +
             "SELECT currval('sizes_id_seq');";
-        return await cnn .QuerySingleOrDefaultAsync<int>(sql, new {
+        return cnn .QueryAsync<int>(sql, new {
             size.Width,
             size.Height
-        });
+        })
+            .GetAwaiter()
+            .GetResult()
+            .First();
     }
 
     public async Task UpdateAsync(Size size)
     {
         await using var cnn = await DataSource.OpenConnectionAsync();
         const string sql = "UPDATE sizes SET width = @Width, height = @Height WHERE id = @SizeId;";
-        await cnn .QuerySingleAsync(sql, new {
+        await cnn .QueryAsync(sql, new {
             size.Width,
             size.Height,
             SizeId = size.Id
@@ -58,7 +64,7 @@ public class SizeRepository : RepositoryBase, ISizeRepository
     {
         await using var cnn = await DataSource.OpenConnectionAsync();
         const string sql = "DELETE FROM sizes WHERE id = @SizeId;";
-        await cnn .QuerySingleAsync(sql, new {
+        await cnn .QueryAsync(sql, new {
             SizeId = sizeId
         });
     }

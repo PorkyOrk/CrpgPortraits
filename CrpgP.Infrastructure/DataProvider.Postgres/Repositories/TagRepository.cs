@@ -16,18 +16,24 @@ public class TagRepository : RepositoryBase, ITagRepository
     {
         await using var cnn = await DataSource.OpenConnectionAsync();
         const string sql = "SELECT * FROM tags WHERE id = @TagId;";
-        return await cnn.QueryFirstOrDefaultAsync<Tag>(sql, new {
+        return cnn.QueryAsync<Tag>(sql, new {
             TagId = tagId
-        });
+        })
+            .GetAwaiter()
+            .GetResult()
+            .FirstOrDefault();
     }
 
     public async Task<Tag?> FindByNameAsync(string tagName)
     {
         await using var cnn = await DataSource.OpenConnectionAsync();
         const string sql = "SELECT * FROM tags WHERE name = @TagName;";
-        return await cnn.QueryFirstOrDefaultAsync<Tag>(sql, new {
+        return cnn.QueryAsync<Tag>(sql, new {
             TagName = tagName
-        });
+        })
+            .GetAwaiter()
+            .GetResult()
+            .FirstOrDefault();
     }
 
     public async Task<int> InsertAsync(Tag tag)
@@ -36,16 +42,19 @@ public class TagRepository : RepositoryBase, ITagRepository
         const string sql =
             "INSERT INTO tags (name) VALUES (@TagName);" +
             "SELECT currval('tags_id_seq');";
-        return await cnn.QuerySingleOrDefaultAsync<int>(sql, new {
+        return cnn.QueryAsync<int>(sql, new {
             TagName = tag.Name
-        });
+        })
+            .GetAwaiter()
+            .GetResult()
+            .First();
     }
     
     public async Task DeleteAsync(int tagId)
     {
         await using var cnn = await DataSource.OpenConnectionAsync();
         const string sql = "DELETE FROM tags WHERE id = @TagId;";
-        await cnn.QuerySingleAsync(sql, new {
+        await cnn.QueryAsync(sql, new {
             TageId = tagId
         });
     }

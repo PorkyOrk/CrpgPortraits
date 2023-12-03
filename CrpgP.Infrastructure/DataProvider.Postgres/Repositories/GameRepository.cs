@@ -109,7 +109,6 @@ public class GameRepository : RepositoryBase, IGameRepository
         await cnn.QueryAsync(sql, new {
             GameId = gameId
         });
-        await DeleteAllGameTags(cnn, gameId);
     }
     
     
@@ -152,13 +151,5 @@ public class GameRepository : RepositoryBase, IGameRepository
         {
             await cnn.QueryAsync(sqlInsert, new { TagId = tagId, GameId = gameId });
         }
-    }
-
-    private static async Task DeleteAllGameTags(IDbConnection cnn, int gameId)
-    {
-        const string sql = "DELETE FROM tag_game WHERE tag_game.game_id = @GameId;";
-        await cnn.QueryAsync(sql, new {
-            GameId = gameId
-        });
     }
 }

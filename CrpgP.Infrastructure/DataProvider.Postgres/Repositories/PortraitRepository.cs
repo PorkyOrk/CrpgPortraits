@@ -59,7 +59,7 @@ public class PortraitRepository : RepositoryBase, IPortraitRepository
             "INSERT INTO portraits (file_name, display_name, description, date_created, size_id) " +
             "VALUES (@FileName, @DisplayName, @Description, @Created, @SizeId);" +
             "SELECT currval('portraits_id_seq');";
-        var id = cnn.QuerySingleOrDefaultAsync<int>(sql, new {
+        var id = cnn.QueryAsync<int>(sql, new {
             portrait.FileName,
             portrait.DisplayName,
             portrait.Description,
@@ -67,7 +67,8 @@ public class PortraitRepository : RepositoryBase, IPortraitRepository
             SizeId = portrait.Size.Id
         })
             .GetAwaiter()
-            .GetResult();
+            .GetResult()
+            .FirstOrDefault();
         
         await InsertPortraitTags(cnn, id, portrait.Tags.Select(t => t.Id));
         return id;
@@ -80,7 +81,7 @@ public class PortraitRepository : RepositoryBase, IPortraitRepository
             "UPDATE portraits " +
             "SET file_name = @FileName, display_name = @DisplayName, description = @Description, date_created = @Created, size_id = @SizeId " +
             "WHERE id = @PortraitId;";
-        await cnn.QuerySingleAsync(sql, new {
+        await cnn.QueryAsync(sql, new {
             portrait.FileName,
             portrait.DisplayName,
             portrait.Description,
@@ -95,10 +96,9 @@ public class PortraitRepository : RepositoryBase, IPortraitRepository
     {
         await using var cnn = await DataSource.OpenConnectionAsync();
         const string sql = "DELETE FROM portraits WHERE id = @PortraitId;";
-        await cnn.QuerySingleAsync(sql, new {
+        await cnn.QueryAsync(sql, new {
             PortraitId = portraitId
         });
-        await DeleteAllPortraitTags(cnn, portraitId);
     }
     
     
@@ -141,13 +141,5 @@ public class PortraitRepository : RepositoryBase, IPortraitRepository
         {
             await cnn.QueryAsync(sqlInsert, new { TagId = tagId, PortraitId = portraitId });
         }
-    }
-
-    private static async Task DeleteAllPortraitTags(IDbConnection cnn, int portraitId)
-    {
-        const string sql = "DELETE FROM tag_portrait WHERE tag_portrait.portrait_id = @PortraitId;";
-        await cnn.QueryAsync(sql, new {
-            PortraitId = portraitId
-        });
     }
 }
