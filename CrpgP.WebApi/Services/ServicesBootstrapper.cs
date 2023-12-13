@@ -18,6 +18,8 @@ public static class ServicesBootstrapper
         serviceCollection.AddSingleton<IHealthCheckRepository, HealthCheckRepository>();
         serviceCollection.AddHealthChecks().AddCheck<HealthCheck>("HealthCheck");
 
+        // In-memory Cache
+        serviceCollection.AddMemoryCache();
         
         // Swagger
         serviceCollection.AddEndpointsApiExplorer();
