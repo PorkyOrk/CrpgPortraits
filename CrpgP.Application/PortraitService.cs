@@ -1,6 +1,7 @@
 ﻿using CrpgP.Application.Result;
 using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
+using Microsoft.Extensions.Caching.Memory;
 using Serilog;
 
 namespace CrpgP.Application;
@@ -9,16 +10,22 @@ public class PortraitService
 {
     private readonly IPortraitRepository _repository;
     private readonly ILogger _logger;
+
+    private readonly IMemoryCache _cache;
+    private readonly MemoryCacheEntryOptions _cacheEntryOptions;
+    private const int CacheExpireSeconds = 120;
     
-    public PortraitService(IPortraitRepository repository, ILogger logger)
+    public PortraitService(IPortraitRepository repository, IMemoryCache cache, ILogger logger)
     {
         _repository = repository;
         _logger = logger;
+        _cache = cache;
+        _cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(CacheExpireSeconds));
     }
     
     public async Task<Result<Portrait>> GetPortraitById(int id)
     {
-        var portrait = await _repository.FindByIdAsync(id);
+        var portrait = await CacheHelper.GetEntryFromCacheOrRepository(_cache, _cacheEntryOptions, id,() => _repository.FindByIdAsync(id));
         return portrait is null 
             ? Result<Portrait>.Failure($"Portrait with id: {id} was not found.")
             : Result<Portrait>.Success(portrait);
@@ -26,6 +33,7 @@ public class PortraitService
 
     public async Task<Result<Dictionary<int,Portrait?>>> GetPortraitsByIds(int[] ids)
     {
+        // NOTE: This is not using the cache
         var portraits = await _repository.FindByIdsAsync(ids);
         return Result<Dictionary<int,Portrait?>>.Success(portraits);
     }

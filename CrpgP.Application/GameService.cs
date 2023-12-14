@@ -10,39 +10,24 @@ public class GameService
 {
     private readonly IGameRepository _repository;
     private readonly ILogger _logger;
+    
     private readonly IMemoryCache _cache;
     private readonly MemoryCacheEntryOptions _cacheEntryOptions;
+    private const int CacheExpireSeconds = 120;
+    
     
     public GameService(IGameRepository repository, IMemoryCache cache, ILogger logger)
     {
         _repository = repository;
-        _cache = cache;
         _logger = logger;
-        
-        // Create options for cache entry
-        const int expireCacheAfterSeconds = 120;
-        _cacheEntryOptions = new MemoryCacheEntryOptions()
-            .SetSlidingExpiration(TimeSpan.FromSeconds(expireCacheAfterSeconds));
-    }
-
-    // TODO: Move to its own file
-    // Generic method to get object from cache, or database using provided delegate
-    public async Task<T?> GetFromCacheOrRepository<T>(Func<Task<T?>> getFromRepositoryDelegate, object cacheKey)
-    {
-        if (!_cache.TryGetValue(cacheKey, out T? result))
-        {
-            result = await getFromRepositoryDelegate.Invoke();
-            if (result != null)
-            {
-                _cache.Set(cacheKey, result, _cacheEntryOptions);
-            }
-        }
-        return result;
+        _cache = cache;
+        _cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(CacheExpireSeconds));
     }
     
     public async Task<Result<Game>> GetGameByIdAsync(int id)
     {
-        var game = await GetFromCacheOrRepository(() => _repository.FindByIdAsync(id), id);
+        var game = await CacheHelper.GetEntryFromCacheOrRepository(
+            _cache, _cacheEntryOptions, id, () => _repository.FindByIdAsync(id));
         
         return game is null 
             ? Result<Game>.Failure($"Game with id: {id} was not found.")
@@ -51,7 +36,9 @@ public class GameService
     
     public async Task<Result<Game>> GetGameByNameAsync(string name)
     {
-        var game = await _repository.FindByNameAsync(name);
+        var game = await CacheHelper.GetEntryFromCacheOrRepository(
+            _cache, _cacheEntryOptions, name, () => _repository.FindByNameAsync(name));
+        
         return game is null
             ? Result<Game>.Failure($"Game with name: {name} was not found.")
             : Result<Game>.Success(game);

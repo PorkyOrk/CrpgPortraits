@@ -1,6 +1,7 @@
 ﻿using CrpgP.Application.Result;
 using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
+using Microsoft.Extensions.Caching.Memory;
 using Serilog;
 
 namespace CrpgP.Application;
@@ -9,16 +10,24 @@ public class TagService
 {
     private readonly ITagRepository _repository;
     private readonly ILogger _logger;
+    
+    private readonly IMemoryCache _cache;
+    private readonly MemoryCacheEntryOptions _cacheEntryOptions;
+    private const int CacheExpireSeconds = 120;
 
-    public TagService(ITagRepository repository, ILogger logger)
+    public TagService(ITagRepository repository, IMemoryCache cache, ILogger logger)
     {
         _repository = repository;
         _logger = logger;
+        _cache = cache;
+        _cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(CacheExpireSeconds));
     }
     
     public async Task<Result<Tag>> GetTagByIdAsync(int id)
     {
-        var tag = await _repository.FindByIdAsync(id);
+        var tag = await CacheHelper.GetEntryFromCacheOrRepository(
+            _cache, _cacheEntryOptions, id, () => _repository.FindByIdAsync(id));
+        
         return tag is null 
             ? Result<Tag>.Failure($"Tag with id: {id} was not found.")
             : Result<Tag>.Success(tag);
@@ -26,7 +35,9 @@ public class TagService
     
     public async Task<Result<Tag>> GetTagByNameAsync(string name)
     {
-        var tag = await _repository.FindByNameAsync(name);
+        var tag = await CacheHelper.GetEntryFromCacheOrRepository(
+            _cache, _cacheEntryOptions, name, () => _repository.FindByNameAsync(name));
+        
         return tag is null
             ? Result<Tag>.Failure($"Tag with name: {name} was not found.")
             : Result<Tag>.Success(tag);

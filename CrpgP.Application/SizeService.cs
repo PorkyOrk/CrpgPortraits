@@ -1,6 +1,7 @@
 ﻿using CrpgP.Application.Result;
 using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
+using Microsoft.Extensions.Caching.Memory;
 using Serilog;
 
 namespace CrpgP.Application;
@@ -10,15 +11,22 @@ public class SizeService
     private readonly ISizeRepository _repository;
     private readonly ILogger _logger;
     
-    public SizeService(ISizeRepository repository, ILogger logger)
+    private readonly IMemoryCache _cache;
+    private readonly MemoryCacheEntryOptions _cacheEntryOptions;
+    private const int CacheExpireSeconds = 120;
+    
+    public SizeService(ISizeRepository repository, IMemoryCache cache, ILogger logger)
     {
         _repository = repository;
         _logger = logger;
+        _cache = cache;
+        _cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(CacheExpireSeconds));
     }
     
     public async Task<Result<Size>> GetSizeByIdAsync(int id)
     {
-        var size = await _repository.FindByIdAsync(id);
+        var size = await CacheHelper.GetEntryFromCacheOrRepository(
+            _cache, _cacheEntryOptions, id, () => _repository.FindByIdAsync(id));
         return size is null 
             ? Result<Size>.Failure($"Size with id: {id} was not found.")
             : Result<Size>.Success(size);
@@ -26,7 +34,9 @@ public class SizeService
 
     public async Task<Result<IEnumerable<Size>>> GetSizeByDimensionsAsync(int width, int height)
     {
-        var sizes = await _repository.FindByDimensionsAsync(width, height);
+        var sizes = await CacheHelper.GetEntryFromCacheOrRepository(
+            _cache, _cacheEntryOptions, new { width, height }, () => _repository.FindByDimensionsAsync(width, height));
+        
         return sizes is null 
             ? Result<IEnumerable<Size>>.Failure($"No sizes with dimensions x:{width} , y:{height} were found.")
             : Result<IEnumerable<Size>>.Success(sizes);
