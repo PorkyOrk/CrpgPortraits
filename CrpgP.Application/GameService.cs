@@ -8,27 +8,25 @@ namespace CrpgP.Application;
 
 public class GameService
 {
+    public bool CacheEnabled { get; set; }
+    public int CacheEntryExpireSeconds { get; set; } = 60;
+    
     private readonly IGameRepository _repository;
     private readonly ILogger _logger;
-    
-    private readonly IMemoryCache _cache;
-    private readonly MemoryCacheEntryOptions _cacheEntryOptions;
-    private const int CacheExpireSeconds = 120;
-    
-    
+    private readonly CacheHelper<Game> _cacheHelper;
+
     public GameService(IGameRepository repository, IMemoryCache cache, ILogger logger)
     {
         _repository = repository;
         _logger = logger;
-        _cache = cache;
-        _cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(CacheExpireSeconds));
+        _cacheHelper = new CacheHelper<Game>(cache, CacheEntryExpireSeconds);
     }
     
     public async Task<Result<Game>> GetGameByIdAsync(int id)
     {
-        var game = await CacheHelper.GetEntryFromCacheOrRepository(
-            _cache, _cacheEntryOptions, id, () => _repository.FindByIdAsync(id));
-        
+        var game = CacheEnabled
+            ? await _cacheHelper.GetEntryFromCacheOrRepository(id, () => _repository.FindByIdAsync(id))
+            : await _repository.FindByIdAsync(id);
         return game is null 
             ? Result<Game>.Failure($"Game with id: {id} was not found.")
             : Result<Game>.Success(game);
@@ -36,9 +34,9 @@ public class GameService
     
     public async Task<Result<Game>> GetGameByNameAsync(string name)
     {
-        var game = await CacheHelper.GetEntryFromCacheOrRepository(
-            _cache, _cacheEntryOptions, name, () => _repository.FindByNameAsync(name));
-        
+        var game = CacheEnabled 
+            ? await _cacheHelper.GetEntryFromCacheOrRepository(name, () => _repository.FindByNameAsync(name))
+            : await _repository.FindByNameAsync(name);
         return game is null
             ? Result<Game>.Failure($"Game with name: {name} was not found.")
             : Result<Game>.Success(game);

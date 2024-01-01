@@ -8,26 +8,25 @@ namespace CrpgP.Application;
 
 public class TagService
 {
+    public bool CacheEnabled { get; set; }
+    public int CacheEntryExpireSeconds { get; set; } = 60;
+    
     private readonly ITagRepository _repository;
     private readonly ILogger _logger;
-    
-    private readonly IMemoryCache _cache;
-    private readonly MemoryCacheEntryOptions _cacheEntryOptions;
-    private const int CacheExpireSeconds = 120;
+    private readonly CacheHelper<Tag> _cacheHelper;
 
     public TagService(ITagRepository repository, IMemoryCache cache, ILogger logger)
     {
         _repository = repository;
         _logger = logger;
-        _cache = cache;
-        _cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(CacheExpireSeconds));
+        _cacheHelper = new CacheHelper<Tag>(cache, CacheEntryExpireSeconds);
     }
     
     public async Task<Result<Tag>> GetTagByIdAsync(int id)
     {
-        var tag = await CacheHelper.GetEntryFromCacheOrRepository(
-            _cache, _cacheEntryOptions, id, () => _repository.FindByIdAsync(id));
-        
+        var tag = CacheEnabled
+            ? await _cacheHelper.GetEntryFromCacheOrRepository(id, () => _repository.FindByIdAsync(id))
+            : await _repository.FindByIdAsync(id);
         return tag is null 
             ? Result<Tag>.Failure($"Tag with id: {id} was not found.")
             : Result<Tag>.Success(tag);
@@ -35,9 +34,9 @@ public class TagService
     
     public async Task<Result<Tag>> GetTagByNameAsync(string name)
     {
-        var tag = await CacheHelper.GetEntryFromCacheOrRepository(
-            _cache, _cacheEntryOptions, name, () => _repository.FindByNameAsync(name));
-        
+        var tag = CacheEnabled
+        ? await _cacheHelper.GetEntryFromCacheOrRepository(name, () => _repository.FindByNameAsync(name))
+        : await _repository.FindByNameAsync(name);
         return tag is null
             ? Result<Tag>.Failure($"Tag with name: {name} was not found.")
             : Result<Tag>.Success(tag);

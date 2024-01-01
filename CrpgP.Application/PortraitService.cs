@@ -8,30 +8,31 @@ namespace CrpgP.Application;
 
 public class PortraitService
 {
+    public bool CacheEnabled { get; set; }
+    public int CacheEntryExpireSeconds { get; set; } = 60;
+    
     private readonly IPortraitRepository _repository;
     private readonly ILogger _logger;
-
-    private readonly IMemoryCache _cache;
-    private readonly MemoryCacheEntryOptions _cacheEntryOptions;
-    private const int CacheExpireSeconds = 120;
+    private readonly CacheHelper<Portrait> _cacheHelper;
     
     public PortraitService(IPortraitRepository repository, IMemoryCache cache, ILogger logger)
     {
         _repository = repository;
         _logger = logger;
-        _cache = cache;
-        _cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(CacheExpireSeconds));
+        _cacheHelper = new CacheHelper<Portrait>(cache, CacheEntryExpireSeconds);
     }
     
     public async Task<Result<Portrait>> GetPortraitById(int id)
     {
-        var portrait = await CacheHelper.GetEntryFromCacheOrRepository(_cache, _cacheEntryOptions, id,() => _repository.FindByIdAsync(id));
+        var portrait = CacheEnabled 
+            ? await _cacheHelper.GetEntryFromCacheOrRepository(id,() => _repository.FindByIdAsync(id))
+            : await _repository.FindByIdAsync(id);
         return portrait is null 
             ? Result<Portrait>.Failure($"Portrait with id: {id} was not found.")
             : Result<Portrait>.Success(portrait);
     }
 
-    public async Task<Result<Dictionary<int,Portrait?>>> GetPortraitsByIds(int[] ids)
+    public async Task<Result<Dictionary<int,Portrait?>>> GetPortraitsByIds(IEnumerable<int> ids)
     {
         // NOTE: This is not using the cache
         var portraits = await _repository.FindByIdsAsync(ids);
