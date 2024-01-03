@@ -1,30 +1,31 @@
-﻿using CrpgP.Application.Result;
+﻿using CrpgP.Application.Options;
+using CrpgP.Application.Result;
 using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace CrpgP.Application;
 
 public class GameService
 {
-    public bool CacheEnabled { get; set; }
-    public int CacheEntryExpireSeconds { get; set; } = 60;
-    
     private readonly IGameRepository _repository;
     private readonly ILogger _logger;
+    private readonly bool _cacheEnabled;
     private readonly CacheHelper<Game> _cacheHelper;
 
-    public GameService(IGameRepository repository, IMemoryCache cache, ILogger logger)
+    public GameService(IOptions<MemoryCacheOptions> memoryCacheOptions, IGameRepository repository, IMemoryCache cache, ILogger logger)
     {
         _repository = repository;
         _logger = logger;
-        _cacheHelper = new CacheHelper<Game>(cache, CacheEntryExpireSeconds);
+        _cacheEnabled = memoryCacheOptions.Value.Enabled;
+        _cacheHelper = new CacheHelper<Game>(cache, memoryCacheOptions.Value.EntryExpiryInSeconds);
     }
     
     public async Task<Result<Game>> GetGameByIdAsync(int id)
     {
-        var game = CacheEnabled
+        var game = _cacheEnabled
             ? await _cacheHelper.GetEntryFromCacheOrRepository(id, () => _repository.FindByIdAsync(id))
             : await _repository.FindByIdAsync(id);
         return game is null 
@@ -34,7 +35,7 @@ public class GameService
     
     public async Task<Result<Game>> GetGameByNameAsync(string name)
     {
-        var game = CacheEnabled 
+        var game = _cacheEnabled 
             ? await _cacheHelper.GetEntryFromCacheOrRepository(name, () => _repository.FindByNameAsync(name))
             : await _repository.FindByNameAsync(name);
         return game is null

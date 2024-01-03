@@ -1,30 +1,31 @@
-﻿using CrpgP.Application.Result;
+﻿using CrpgP.Application.Options;
+using CrpgP.Application.Result;
 using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace CrpgP.Application;
 
 public class PortraitService
 {
-    public bool CacheEnabled { get; set; }
-    public int CacheEntryExpireSeconds { get; set; } = 60;
-    
     private readonly IPortraitRepository _repository;
     private readonly ILogger _logger;
+    private readonly bool _cacheEnabled;
     private readonly CacheHelper<Portrait> _cacheHelper;
     
-    public PortraitService(IPortraitRepository repository, IMemoryCache cache, ILogger logger)
+    public PortraitService(IOptions<MemoryCacheOptions> memoryCacheOptions, IPortraitRepository repository, IMemoryCache cache, ILogger logger)
     {
         _repository = repository;
         _logger = logger;
-        _cacheHelper = new CacheHelper<Portrait>(cache, CacheEntryExpireSeconds);
+        _cacheEnabled = memoryCacheOptions.Value.Enabled;
+        _cacheHelper = new CacheHelper<Portrait>(cache, memoryCacheOptions.Value.EntryExpiryInSeconds);
     }
     
     public async Task<Result<Portrait>> GetPortraitById(int id)
     {
-        var portrait = CacheEnabled 
+        var portrait = _cacheEnabled 
             ? await _cacheHelper.GetEntryFromCacheOrRepository(id,() => _repository.FindByIdAsync(id))
             : await _repository.FindByIdAsync(id);
         return portrait is null 

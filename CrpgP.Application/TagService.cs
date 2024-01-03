@@ -1,30 +1,32 @@
-﻿using CrpgP.Application.Result;
+﻿using CrpgP.Application.Options;
+using CrpgP.Application.Result;
 using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace CrpgP.Application;
 
 public class TagService
 {
-    public bool CacheEnabled { get; set; }
-    public int CacheEntryExpireSeconds { get; set; } = 60;
-    
     private readonly ITagRepository _repository;
     private readonly ILogger _logger;
+    private readonly bool _cacheEnabled;
     private readonly CacheHelper<Tag> _cacheHelper;
 
-    public TagService(ITagRepository repository, IMemoryCache cache, ILogger logger)
+    public TagService(
+        IOptions<MemoryCacheOptions> memoryCacheOptions, ITagRepository repository, IMemoryCache cache, ILogger logger)
     {
         _repository = repository;
         _logger = logger;
-        _cacheHelper = new CacheHelper<Tag>(cache, CacheEntryExpireSeconds);
+        _cacheEnabled = memoryCacheOptions.Value.Enabled;
+        _cacheHelper = new CacheHelper<Tag>(cache, memoryCacheOptions.Value.EntryExpiryInSeconds);
     }
     
     public async Task<Result<Tag>> GetTagByIdAsync(int id)
     {
-        var tag = CacheEnabled
+        var tag = _cacheEnabled
             ? await _cacheHelper.GetEntryFromCacheOrRepository(id, () => _repository.FindByIdAsync(id))
             : await _repository.FindByIdAsync(id);
         return tag is null 
@@ -34,7 +36,7 @@ public class TagService
     
     public async Task<Result<Tag>> GetTagByNameAsync(string name)
     {
-        var tag = CacheEnabled
+        var tag = _cacheEnabled
         ? await _cacheHelper.GetEntryFromCacheOrRepository(name, () => _repository.FindByNameAsync(name))
         : await _repository.FindByNameAsync(name);
         return tag is null

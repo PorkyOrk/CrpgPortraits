@@ -1,30 +1,33 @@
-﻿using CrpgP.Application.Result;
+﻿using CrpgP.Application.Options;
+using CrpgP.Application.Result;
 using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace CrpgP.Application;
 
 public class SizeService
 {
-    public bool CacheEnabled { get; set; }
-    public int CacheEntryExpireSeconds { get; set; } = 60;
-    
     private readonly ISizeRepository _repository;
     private readonly ILogger _logger;
+    private readonly bool _cacheEnabled;
     private readonly CacheHelper<Size> _cacheHelper;
     
-    public SizeService(ISizeRepository repository, IMemoryCache cache, ILogger logger)
+    public SizeService(IOptions<MemoryCacheOptions> memoryCacheOptions, ISizeRepository repository, IMemoryCache cache, ILogger logger)
     {
         _repository = repository;
         _logger = logger;
-        _cacheHelper = new CacheHelper<Size>(cache, CacheEntryExpireSeconds);
+        _cacheEnabled = memoryCacheOptions.Value.Enabled;
+        _cacheHelper = new CacheHelper<Size>(cache, memoryCacheOptions.Value.EntryExpiryInSeconds);
     }
     
     public async Task<Result<Size>> GetSizeByIdAsync(int id)
     {
-        var size = await _cacheHelper.GetEntryFromCacheOrRepository(id, () => _repository.FindByIdAsync(id));
+        var size = _cacheEnabled 
+            ? await _cacheHelper.GetEntryFromCacheOrRepository(id, () => _repository.FindByIdAsync(id))
+            : await _repository.FindByIdAsync(id);
         return size is null 
             ? Result<Size>.Failure($"Size with id: {id} was not found.")
             : Result<Size>.Success(size);
