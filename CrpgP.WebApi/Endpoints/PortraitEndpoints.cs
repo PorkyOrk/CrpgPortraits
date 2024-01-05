@@ -14,14 +14,14 @@ public static class PortraitEndpoints
         app.MapGet("api/v1/portrait", async Task<IResult>(
             [FromQuery(Name="id")] int id) =>
         {
-            var result = await portraitService.GetPortraitById(id);
+            var result = await portraitService.GetPortraitByIdAsync(id);
             return Results.Json(result);
         });
         
         app.MapGet("api/v1/portraits", async Task<IResult>(
             [FromQuery(Name="id")] int[] ids) =>
         {
-            var result = await portraitService.GetPortraitsByIds(ids);
+            var result = await portraitService.GetPortraitsByIdsAsync(ids);
             return Results.Json(result);
         });
 
@@ -29,7 +29,7 @@ public static class PortraitEndpoints
             HttpRequest request) =>
         {
             var jsonBody = await new StreamReader(request.Body).ReadToEndAsync();
-            var result = await portraitService.CreatePortrait(jsonBody);
+            var result = await portraitService.CreatePortraitAsync(jsonBody);
             return Results.Json(result);
         });
         
@@ -37,14 +37,14 @@ public static class PortraitEndpoints
             HttpRequest request) =>
         {
             var jsonBody = await new StreamReader(request.Body).ReadToEndAsync();
-            var result = await portraitService.UpdatePortrait(jsonBody);
+            var result = await portraitService.UpdatePortraitAsync(jsonBody);
             return Results.Json(result);
         });
         
         app.MapDelete("api/v1/portrait/delete", async Task<IResult>(
             [FromQuery(Name="id")] int id) =>
         {
-            var result = await portraitService.DeletePortrait(id);
+            var result = await portraitService.DeletePortraitAsync(id);
             return Results.Json(result);
         });
     }

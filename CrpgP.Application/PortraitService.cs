@@ -23,7 +23,7 @@ public class PortraitService
         _cacheHelper = new CacheHelper<Portrait>(cache, memoryCacheOptions.Value.EntryExpiryInSeconds);
     }
     
-    public async Task<Result<Portrait>> GetPortraitById(int id)
+    public async Task<Result<Portrait>> GetPortraitByIdAsync(int id)
     {
         var portrait = _cacheEnabled 
             ? await _cacheHelper.GetEntryFromCacheOrRepository(id,() => _repository.FindByIdAsync(id))
@@ -33,14 +33,14 @@ public class PortraitService
             : Result<Portrait>.Success(portrait);
     }
 
-    public async Task<Result<Dictionary<int,Portrait?>>> GetPortraitsByIds(IEnumerable<int> ids)
+    public async Task<Result<Dictionary<int,Portrait?>>> GetPortraitsByIdsAsync(IEnumerable<int> ids)
     {
         // NOTE: This is not using the cache
         var portraits = await _repository.FindByIdsAsync(ids);
         return Result<Dictionary<int,Portrait?>>.Success(portraits);
     }
 
-    public async Task<Result<int>> CreatePortrait(string json)
+    public async Task<Result<int>> CreatePortraitAsync(string json)
     {
         try
         {
@@ -55,7 +55,7 @@ public class PortraitService
         }
     }
 
-    public async Task<Result<object>> UpdatePortrait(string json)
+    public async Task<Result<object>> UpdatePortraitAsync(string json)
     {
         try
         {
@@ -70,7 +70,7 @@ public class PortraitService
         }
     }
     
-    public async Task<Result<object>> DeletePortrait(int id)
+    public async Task<Result<object>> DeletePortraitAsync(int id)
     {
         try
         {

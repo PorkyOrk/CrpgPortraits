@@ -6,7 +6,6 @@ using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using NSubstitute.ExceptionExtensions;
 using NSubstitute.ReturnsExtensions;
 using Serilog;
 
@@ -33,9 +32,7 @@ public class GameServiceTests
     {
         // Arrange
         var game = new Game { Name = "Test Game", PortraitSize = new Size() };
-        _mockRepository.FindByIdAsync(1).Returns(game);
-        _mockIOption.Value.Returns(new MemoryCacheOptions { Enabled = false, EntryExpiryInSeconds = 1 });
-        
+        _mockRepository.FindByIdAsync(1).ReturnsForAnyArgs(game);
         var gameService = new GameService(
             _mockIOption,
             _mockRepository,
@@ -56,8 +53,6 @@ public class GameServiceTests
     {
         // Arrange
         _mockRepository.FindByIdAsync(1).ReturnsNullForAnyArgs();
-        _mockIOption.Value.Returns(new MemoryCacheOptions { Enabled = false, EntryExpiryInSeconds = 1 });
-        
         var gameService = new GameService(
             _mockIOption,
             _mockRepository,
@@ -78,9 +73,8 @@ public class GameServiceTests
     {
         // Arrange
         var game = new Game { Name = "Test Game", PortraitSize = new Size() };
-        _mockRepository.FindByNameAsync("Test Game").Returns(game);
+        _mockRepository.FindByNameAsync("Test Game").ReturnsForAnyArgs(game);
         _mockIOption.Value.Returns(new MemoryCacheOptions { Enabled = false, EntryExpiryInSeconds = 1 });
-        
         var gameService = new GameService(
             _mockIOption,
             _mockRepository,
@@ -97,12 +91,11 @@ public class GameServiceTests
     }
     
     [Test]
-    public async Task GetGameByNameAsync_NameExists_ResultNotSuccessAndMessage()
+    public async Task GetGameByNameAsync_NameDoesNotExists_ResultNotSuccessAndMessage()
     {
         // Arrange
         _mockRepository.FindByNameAsync("Test Game").ReturnsNullForAnyArgs();
         _mockIOption.Value.Returns(new MemoryCacheOptions { Enabled = false, EntryExpiryInSeconds = 1 });
-        
         var gameService = new GameService(
             _mockIOption,
             _mockRepository,
@@ -119,7 +112,7 @@ public class GameServiceTests
     }
 
     [Test]
-    public async Task CreateGameAsync_CreateSuccess_ResultSuccessAndGame()
+    public async Task CreateGameAsync_CreateSuccess_ResultSuccessAndId()
     {
         // Arrange
         var game = new Game { Name = "Test Game", PortraitSize = new Size() };
@@ -140,34 +133,6 @@ public class GameServiceTests
             && result.Value!.Equals(1));
     }
     
-    
-    // TODO: Mock exception from repository
-    // [Test]
-    // public async Task CreateGameAsync_NotCreated_ResultSNotSuccessAndMessage()
-    // {
-    //     // Arrange
-    //     var game = new Game { Name = "Test Game", PortraitSize = new Size() };
-    //     // _mockRepository.InsertAsync(game).Returns(x => throw new Exception("Test creation failed exception"));
-    //     _mockRepository.When(x => x.InsertAsync(game))
-    //         .Do(x => throw new Exception("Test creation failed exception"));
-    //     
-    //     var gameService = new GameService(
-    //         _mockIOption,
-    //         _mockRepository,
-    //         Substitute.For<IMemoryCache>(),
-    //         Substitute.For<ILogger>());
-    //     
-    //     // Act
-    //     var sut = await gameService.CreateGameAsync(JsonSerializer.Serialize(game));
-    //
-    //     // Assert
-    //     sut.Should().Match<Result<int>>(result => 
-    //         result.IsSuccess == false
-    //         && result.Messages!.Length > 0);
-    // }
-    
-    
-    // UpdateGameAsync
     [Test]
     public async Task UpdateGameAsync_UpdateSuccess_ResultSuccess()
     {
@@ -186,7 +151,6 @@ public class GameServiceTests
         sut.Should().Match<Result<object>>(result => result.IsSuccess == true);
     }
     
-    // DeleteGameAsync
     [Test]
     public async Task DeleteGameAsync_DeleteSuccess_ResultSuccess()
     {
