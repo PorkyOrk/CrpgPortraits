@@ -1,0 +1,57 @@
+﻿@page "/games"
+@using CrpgP.WebApplication.Contracts
+@using System.Text.Json
+
+<PageTitle>Games</PageTitle>
+
+
+
+<h3>Games</h3>
+
+@if (_result != null)
+{
+    <div>
+        @_result
+    </div>
+    <br>
+    <div>
+        @_json
+    </div>
+}
+
+
+
+
+
+@code {
+
+    private Result<Game>? _result;
+    private Game[]? _games;
+    private string _json;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+        
+        HttpClient _client = new HttpClient();
+
+        const string uri = "http://localhost:5100/api/v1/game?id=1";
+
+        var response =  await _client.GetAsync(uri);
+
+        var responseJsonString = await response.Content.ReadAsStringAsync();
+
+        _json = responseJsonString;
+        _result = JsonSerializer.Deserialize<Result<Game>>(responseJsonString);
+        
+        
+
+
+
+        // return base.OnInitializedAsync();
+    }
+
+    
+    
+}
