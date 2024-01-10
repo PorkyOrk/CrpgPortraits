@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using CrpgP.Application;
 using CrpgP.Application.Options;
-using CrpgP.Application.Result;
 using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
 using Microsoft.Extensions.Caching.Memory;
@@ -41,7 +40,7 @@ public class PortraitServiceTests
         var sut = await portraitService.GetPortraitByIdAsync(1);
 
         // Assert
-        sut.Should().Match<Result<Portrait>>(result => 
+        sut.Should().Match<Result>(result => 
             result.IsSuccess == true
             && result.Value!.Equals(portrait));
     }
@@ -67,7 +66,7 @@ public class PortraitServiceTests
         var sut = await portraitService.GetPortraitsByIdsAsync([1,2,3]);
         
         // Assert
-        sut.Should().Match<Result<Dictionary<int,Portrait>>>(result => 
+        sut.Should().Match<Result>(result => 
             result.IsSuccess == true
             && result.Value!.Equals(portraits));
     }
@@ -85,10 +84,10 @@ public class PortraitServiceTests
             Substitute.For<ILogger>());
         
         // Act
-        var sut = await portraitService.CreatePortraitAsync(JsonSerializer.Serialize(portrait));
+        var sut = await portraitService.CreatePortraitAsync(portrait);
 
         // Assert
-        sut.Should().Match<Result<int>>(result => 
+        sut.Should().Match<Result>(result => 
             result.IsSuccess == true
             && result.Value!.Equals(1));
     }
@@ -105,10 +104,10 @@ public class PortraitServiceTests
             Substitute.For<ILogger>());
         
         // Act
-        var sut = await portraitService.UpdatePortraitAsync(JsonSerializer.Serialize(portrait));
+        var sut = await portraitService.UpdatePortraitAsync(portrait);
 
         // Assert
-        sut.Should().Match<Result<object>>(result => result.IsSuccess == true);
+        sut.Should().Match<Result>(result => result.IsSuccess == true);
     }
     
     [Test]
@@ -125,7 +124,7 @@ public class PortraitServiceTests
         var sut = await gameService.DeletePortraitAsync(1);
 
         // Assert
-        sut.Should().Match<Result<object>>(result => result.IsSuccess == true);
+        sut.Should().Match<Result>(result => result.IsSuccess == true);
     }
 
 }

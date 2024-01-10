@@ -1,4 +1,4 @@
-﻿namespace CrpgP.WebApplication.Contracts;
+﻿namespace CrpgP.WebApplication.Models;
 
 internal sealed class Result<T>
 {

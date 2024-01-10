@@ -1,9 +1,9 @@
 ﻿using System.Text.Json;
 using CrpgP.Application;
 using CrpgP.Application.Options;
-using CrpgP.Application.Result;
 using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
+using CrpgP.Domain.Errors;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using NSubstitute.ReturnsExtensions;
@@ -42,7 +42,7 @@ public class SizeServiceTests
         var sut = await sizeService.GetSizeByIdAsync(1);
 
         // Assert
-        sut.Should().Match<Result<Size>>(result => 
+        sut.Should().Match<Result>(result => 
             result.IsSuccess == true
             && result.Value!.Equals(size));
     }
@@ -63,13 +63,13 @@ public class SizeServiceTests
         var sut = await sizeService.GetSizeByDimensionsAsync(100,200);
 
         // Assert
-        sut.Should().Match<Result<IEnumerable<Size>>>(result => 
+        sut.Should().Match<Result>(result => 
             result.IsSuccess == true
             && result.Value!.Equals(size));
     }
     
     [Test]
-    public async Task GetSizeByDimensionsAsync_SizeDoesNotExists_ResultNotSuccessAndMessage()
+    public async Task GetSizeByDimensionsAsync_SizeDoesNotExists_ResultNotSuccessAndError()
     {
         // Arrange
         _mockRepository.FindByDimensionsAsync(100,200).ReturnsNullForAnyArgs();
@@ -83,9 +83,7 @@ public class SizeServiceTests
         var sut = await sizeService.GetSizeByDimensionsAsync(100,200);
 
         // Assert
-        sut.Should().Match<Result<IEnumerable<Size>>>(result => 
-            result.IsSuccess == false
-            && result.Messages!.Length > 0);
+        sut.Should().Match<Result>(result => !result.IsSuccess && result.Error == SizeErrors.NotFoundByDimensions(100,200));
     }
     
     [Test]
@@ -101,10 +99,10 @@ public class SizeServiceTests
             Substitute.For<ILogger>());
         
         // Act
-        var sut = await sizeService.CreateSizeAsync(JsonSerializer.Serialize(size));
+        var sut = await sizeService.CreateSizeAsync(size);
 
         // Assert
-        sut.Should().Match<Result<int>>(result => 
+        sut.Should().Match<Result>(result => 
             result.IsSuccess == true
             && result.Value.Equals(1));
     }
@@ -121,10 +119,10 @@ public class SizeServiceTests
             Substitute.For<ILogger>());
         
         // Act
-        var sut = await sizeService.UpdateSizeAsync(JsonSerializer.Serialize(size));
+        var sut = await sizeService.UpdateSizeAsync(size);
 
         // Assert
-        sut.Should().Match<Result<object>>(result => result.IsSuccess == true);
+        sut.Should().Match<Result>(result => result.IsSuccess == true);
     }
     
     [Test]
@@ -141,7 +139,7 @@ public class SizeServiceTests
         var sut = await sizeService.DeleteSizeAsync(1);
 
         // Assert
-        sut.Should().Match<Result<object>>(result => result.IsSuccess == true);
+        sut.Should().Match<Result>(result => result.IsSuccess == true);
     }
     
 }

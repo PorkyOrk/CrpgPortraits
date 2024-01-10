@@ -1,4 +1,5 @@
 ﻿using CrpgP.Application;
+using CrpgP.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CrpgP.WebApi.Endpoints;
@@ -11,33 +12,28 @@ public static class TagEndpoints
             ?? throw new NullReferenceException($"Unable to find {nameof(TagService)}.");
         
         
-        app.MapGet("api/v1/tag", async Task<IResult>(
-            [FromQuery(Name = "id")] int id) =>
+        app.MapGet("api/v1/tag", async Task<IResult>([FromQuery(Name = "id")] int id) =>
         {
             var result = await tagService.GetTagByIdAsync(id);
-            return Results.Json(result);
+            return result.IsSuccess ? Results.Ok(result) : result.ToProblemDetails();
         });
         
-        app.MapGet("api/v1/tag/find", async Task<IResult>(
-            [FromQuery(Name = "name")] string name) =>
+        app.MapGet("api/v1/tag/find", async Task<IResult>([FromQuery(Name = "name")] string name) =>
         {
             var result = await tagService.GetTagByNameAsync(name);
-            return Results.Json(result);
+            return result.IsSuccess ? Results.Ok(result) : result.ToProblemDetails();
         });
 
-        app.MapPost("api/v1/tag/create", async Task<IResult>(
-            HttpRequest request) =>
+        app.MapPost("api/v1/tag/create", async Task<IResult>(Tag tag) =>
         {
-            var jsonBody =  await new StreamReader(request.Body).ReadToEndAsync();
-            var result = await tagService.CreateTagAsync(jsonBody);
-            return Results.Json(result);
+            var result = await tagService.CreateTagAsync(tag);
+            return result.IsSuccess ? Results.Ok(result) : result.ToProblemDetails();
         });
         
-        app.MapDelete("api/v1/tag/delete", async Task<IResult>(
-            [FromQuery(Name = "id")] int id) =>
+        app.MapDelete("api/v1/tag/delete", async Task<IResult>([FromQuery(Name = "id")] int id) =>
         {
             var result = await tagService.DeleteTagAsync(id);
-            return Results.Json(result);
+            return result.IsSuccess ? Results.Ok(result) : result.ToProblemDetails();
         });
     }
 }

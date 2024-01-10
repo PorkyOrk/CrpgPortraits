@@ -1,6 +1,6 @@
 ﻿@page "/games"
-@using CrpgP.WebApplication.Contracts
 @using System.Text.Json
+@using CrpgP.WebApplication.Models
 
 <PageTitle>Games</PageTitle>
 
@@ -33,10 +33,11 @@
     protected override async Task OnInitializedAsync()
     {
         
+        // TODO Make it properly
         
         HttpClient _client = new HttpClient();
 
-        const string uri = "http://localhost:5100/api/v1/game?id=1";
+        const string uri = "http://localhost:5100/api/v1/game?id=2";
 
         var response =  await _client.GetAsync(uri);
 

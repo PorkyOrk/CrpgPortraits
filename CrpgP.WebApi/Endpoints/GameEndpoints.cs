@@ -1,4 +1,6 @@
-﻿using CrpgP.Application;
+﻿using System.Text.Json;
+using CrpgP.Application;
+using CrpgP.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CrpgP.WebApi.Endpoints;
@@ -11,41 +13,34 @@ public static class GameEndpoints
             ?? throw new NullReferenceException($"Unable to find {nameof(TagService)}.");
         
         
-        app.MapGet("api/v1/game", async Task<IResult>(
-            [FromQuery(Name="id")] int id) =>
+        app.MapGet("api/v1/game", async Task<IResult>([FromQuery(Name="id")] int id) =>
         {
-            var result = await gameService.GetGameByIdAsync(id);
-            return Results.Json(result);
+            var result =  await gameService.GetGameByIdAsync(id);
+            return result.IsSuccess ? Results.Ok(result) : result.ToProblemDetails();
         });
         
-        app.MapGet("api/v1/game/find", async Task<IResult>(
-            [FromQuery(Name="name")] string name) =>
+        app.MapGet("api/v1/game/find", async Task<IResult>([FromQuery(Name="name")] string name) =>
         {
             var result = await gameService.GetGameByNameAsync(name);
-            return Results.Json(result);
+            return result.IsSuccess ? Results.Ok(result) : result.ToProblemDetails();
         });
         
-        app.MapPost("api/v1/game/create", async Task<IResult>(
-            HttpRequest request) =>
+        app.MapPost("api/v1/game/create", async Task<IResult>(Game game) =>
         {
-            var jsonBody = await new StreamReader(request.Body).ReadToEndAsync();
-            var result = await gameService.CreateGameAsync(jsonBody);
-            return Results.Json(result);
+            var result = await gameService.CreateGameAsync(game);
+            return result.IsSuccess ? Results.Ok(result) : result.ToProblemDetails();
         });
         
-        app.MapPut("api/v1/game/update", async Task<IResult>(
-            HttpRequest request) =>
+        app.MapPut("api/v1/game/update", async Task<IResult>(Game game) =>
         {
-            var jsonBody = await new StreamReader(request.Body).ReadToEndAsync();
-            var result = await gameService.UpdateGameAsync(jsonBody);
-            return Results.Json(result);
+            var result = await gameService.UpdateGameAsync(game);
+            return result.IsSuccess ? Results.Ok(result) : result.ToProblemDetails();
         });
         
-        app.MapDelete("api/v1/game/delete", async Task<IResult>(
-            [FromQuery(Name="id")] int id) =>
+        app.MapDelete("api/v1/game/delete", async Task<IResult>([FromQuery(Name="id")] int id) =>
         {
             var result = await gameService.DeleteGameAsync(id);
-            return Results.Json(result);
+            return result.IsSuccess ? Results.Ok(result) : result.ToProblemDetails();
         });
     }
 }

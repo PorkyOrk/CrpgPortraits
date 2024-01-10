@@ -1,7 +1,7 @@
 ﻿using CrpgP.Application.Options;
-using CrpgP.Application.Result;
 using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
+using CrpgP.Domain.Errors;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Serilog;
@@ -23,67 +23,66 @@ public class GameService
         _cacheHelper = new CacheHelper<Game>(cache, memoryCacheOptions.Value.EntryExpiryInSeconds);
     }
     
-    public async Task<Result<Game>> GetGameByIdAsync(int id)
+    public async Task<Result> GetGameByIdAsync(int id)
     {
         var game = _cacheEnabled
             ? await _cacheHelper.GetEntryFromCacheOrRepository(id, () => _repository.FindByIdAsync(id))
             : await _repository.FindByIdAsync(id);
+        
         return game is null 
-            ? Result<Game>.Failure($"Game with id: {id} was not found.")
-            : Result<Game>.Success(game);
+            ? Result.Failure(GameErrors.NotFound(id))
+            : Result.Success(game);
     }
     
-    public async Task<Result<Game>> GetGameByNameAsync(string name)
+    public async Task<Result> GetGameByNameAsync(string name)
     {
         var game = _cacheEnabled 
             ? await _cacheHelper.GetEntryFromCacheOrRepository(name, () => _repository.FindByNameAsync(name))
             : await _repository.FindByNameAsync(name);
         return game is null
-            ? Result<Game>.Failure($"Game with name: {name} was not found.")
-            : Result<Game>.Success(game);
+            ? Result.Failure(GameErrors.NotFoundByName(name))
+            : Result.Success(game);
     }
     
-    public async Task<Result<int>> CreateGameAsync(string json)
+    public async Task<Result> CreateGameAsync(Game game)
     {
         try
         {
-            var game = Validation.Mapper.MapToType<Game>(json);
-            var result = await _repository.InsertAsync(game);
-            return Result<int>.Success(result);
+            var id = await _repository.InsertAsync(game);
+            return Result.Success(id);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            _logger.Error("Game create failed. {0}", e.Message);
-            return Result<int>.Failure(e.Message);
+            _logger.Error("Game create failed. {0}", ex.Message);
+            return Result.Failure(GameErrors.CreateFailed());
         }
     }
     
-    public async Task<Result<object>> UpdateGameAsync(string json)
+    public async Task<Result> UpdateGameAsync(Game game)
     {
         try
         {
-            var game = Validation.Mapper.MapToType<Game>(json);
             await _repository.UpdateAsync(game);
-            return Result<object>.Success();
+            return Result.Success();
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            _logger.Error("Game update failed. {0}", e.Message);
-            return Result<object>.Failure(e.Message);
+            _logger.Error("Game update failed. {0}", ex.Message);
+            return Result.Failure(GameErrors.UpdateFailed());
         }
     }
     
-    public async Task<Result<object>> DeleteGameAsync(int id)
+    public async Task<Result> DeleteGameAsync(int id)
     {
         try
         {
             await _repository.DeleteAsync(id);
-            return Result<object>.Success();
+            return Result.Success();
         }
         catch (Exception e)
         {
             _logger.Error("Game delete failed. {0}", e.Message);
-            return Result<object>.Failure(e.Message);
+            return Result.Failure(GameErrors.DeleteFailed());
         }
     }
 }

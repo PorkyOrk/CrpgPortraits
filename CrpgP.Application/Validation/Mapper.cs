@@ -8,6 +8,6 @@ public static class Mapper
     public static T MapToType<T>(string json)
     {
         var result = JsonSerializer.Deserialize<T>(json, JsonSerializerOptions.Default);
-        return result ?? throw new JsonPayloadDeserializationException("Unable to map payload to Game object.");
+        return result ?? throw new JsonPayloadDeserializationException($"Unable to map payload to type {typeof(T).Name}.");
     }
 }
