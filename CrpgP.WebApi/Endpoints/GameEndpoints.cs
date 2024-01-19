@@ -10,7 +10,7 @@ public static class GameEndpoints
     public static void MapGameEndpoints(this WebApplication app)
     {
         var gameService = app.Services.GetService<GameService>()
-            ?? throw new NullReferenceException($"Unable to find {nameof(TagService)}.");
+            ?? throw new NullReferenceException($"Unable to find {nameof(GameService)}.");
         
         
         app.MapGet("api/v1/game", async Task<IResult>([FromQuery(Name="id")] int id) =>
