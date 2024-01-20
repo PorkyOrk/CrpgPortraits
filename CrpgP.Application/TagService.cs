@@ -1,4 +1,5 @@
 ﻿using CrpgP.Application.Options;
+using CrpgP.Domain;
 using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
 using CrpgP.Domain.Errors;

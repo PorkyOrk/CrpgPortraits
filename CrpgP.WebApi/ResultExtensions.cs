@@ -1,4 +1,4 @@
-﻿using CrpgP.Application;
+﻿using CrpgP.Domain;
 using CrpgP.Domain.Errors;
 
 namespace CrpgP.WebApi;
