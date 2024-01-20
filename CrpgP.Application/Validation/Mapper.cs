@@ -3,6 +3,7 @@ using CrpgP.Application.Exceptions;
 
 namespace CrpgP.Application.Validation;
 
+[Obsolete]
 public static class Mapper
 {
     public static T MapToType<T>(string json)

@@ -1,3 +1,4 @@
+using CrpgP.WebApplication;
 using CrpgP.WebApplication.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -5,6 +6,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddHttpClient();
+builder.Services.AddSingleton<ApiService>();
 
 var app = builder.Build();
 
