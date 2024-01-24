@@ -1,9 +1,9 @@
-﻿using System.Text.Json;
-using CrpgP.Application;
+﻿using CrpgP.Application;
 using CrpgP.Application.Options;
-using CrpgP.Application.Result;
+using CrpgP.Domain;
 using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
+using CrpgP.Domain.Errors;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using NSubstitute.ReturnsExtensions;
@@ -43,13 +43,13 @@ public class GameServiceTests
         var sut = await gameService.GetGameByIdAsync(1);
 
         // Assert
-        sut.Should().Match<Result<Game>>(result => 
+        sut.Should().Match<Result>(result => 
             result.IsSuccess == true
             && result.Value!.Equals(game));
     }
     
     [Test]
-    public async Task GetGameByIdAsync_ExistingId_ResultNotSuccessAndMessage()
+    public async Task GetGameByIdAsync_ExistingId_ResultNotSuccessAndError()
     {
         // Arrange
         _mockRepository.FindByIdAsync(1).ReturnsNullForAnyArgs();
@@ -63,9 +63,7 @@ public class GameServiceTests
         var sut = await gameService.GetGameByIdAsync(1);
 
         // Assert
-        sut.Should().Match<Result<Game>>(result =>
-            result.IsSuccess == false
-            && result.Messages!.Length > 0);
+        sut.Should().Match<Result>(result => !result.IsSuccess && result.Error == GameErrors.NotFound(1));
     }
 
     [Test]
@@ -85,13 +83,13 @@ public class GameServiceTests
         var sut = await gameService.GetGameByNameAsync("Test Game");
 
         // Assert
-        sut.Should().Match<Result<Game>>(result => 
+        sut.Should().Match<Result>(result => 
             result.IsSuccess == true
             && result.Value!.Equals(game));
     }
     
     [Test]
-    public async Task GetGameByNameAsync_NameDoesNotExists_ResultNotSuccessAndMessage()
+    public async Task GetGameByNameAsync_NameDoesNotExists_ResultNotSuccessAndError()
     {
         // Arrange
         _mockRepository.FindByNameAsync("Test Game").ReturnsNullForAnyArgs();
@@ -106,9 +104,7 @@ public class GameServiceTests
         var sut = await gameService.GetGameByNameAsync("Test Game");
 
         // Assert
-        sut.Should().Match<Result<Game>>(result => 
-            result.IsSuccess == false
-            && result.Messages!.Length > 0);
+        sut.Should().Match<Result>(result => !result.IsSuccess && result.Error == GameErrors.NotFoundByName("Test Game"));
     }
 
     [Test]
@@ -125,10 +121,11 @@ public class GameServiceTests
             Substitute.For<ILogger>());
         
         // Act
-        var sut = await gameService.CreateGameAsync(JsonSerializer.Serialize(game));
+        var sut = await gameService.CreateGameAsync(game);
 
         // Assert
-        sut.Should().Match<Result<int>>(result => 
+        sut.Should().Match<Result>(result => 
+
             result.IsSuccess == true
             && result.Value!.Equals(1));
     }
@@ -145,10 +142,10 @@ public class GameServiceTests
             Substitute.For<ILogger>());
         
         // Act
-        var sut = await gameService.UpdateGameAsync(JsonSerializer.Serialize(game));
+        var sut = await gameService.UpdateGameAsync(game);
 
         // Assert
-        sut.Should().Match<Result<object>>(result => result.IsSuccess == true);
+        sut.Should().Match<Result>(result => result.IsSuccess == true);
     }
     
     [Test]
@@ -165,7 +162,7 @@ public class GameServiceTests
         var sut = await gameService.DeleteGameAsync(1);
 
         // Assert
-        sut.Should().Match<Result<object>>(result => result.IsSuccess == true);
+        sut.Should().Match<Result>(result => result.IsSuccess == true);
     }
     
 }

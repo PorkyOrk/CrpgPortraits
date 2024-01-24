@@ -1,7 +1,8 @@
 ﻿using CrpgP.Application.Options;
-using CrpgP.Application.Result;
+using CrpgP.Domain;
 using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
+using CrpgP.Domain.Errors;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Serilog;
@@ -23,65 +24,63 @@ public class SizeService
         _cacheHelper = new CacheHelper<Size>(cache, memoryCacheOptions.Value.EntryExpiryInSeconds);
     }
     
-    public async Task<Result<Size>> GetSizeByIdAsync(int id)
+    public async Task<Result> GetSizeByIdAsync(int id)
     {
         var size = _cacheEnabled 
             ? await _cacheHelper.GetEntryFromCacheOrRepository(id, () => _repository.FindByIdAsync(id))
             : await _repository.FindByIdAsync(id);
         return size is null 
-            ? Result<Size>.Failure($"Size with id: {id} was not found.")
-            : Result<Size>.Success(size);
+            ? Result.Failure(SizeErrors.NotFound(id))
+            : Result.Success(size);
     }
 
-    public async Task<Result<IEnumerable<Size>>> GetSizeByDimensionsAsync(int width, int height)
+    public async Task<Result> GetSizeByDimensionsAsync(int width, int height)
     {
         var sizes = await _repository.FindByDimensionsAsync(width, height);
         return sizes is null 
-            ? Result<IEnumerable<Size>>.Failure($"No sizes with dimensions x:{width} , y:{height} were found.")
-            : Result<IEnumerable<Size>>.Success(sizes);
+            ? Result.Failure(SizeErrors.NotFoundByDimensions(width,height))
+            : Result.Success(sizes);
     }
 
-    public async Task<Result<int>> CreateSizeAsync(string json)
+    public async Task<Result> CreateSizeAsync(Size size)
     {
         try
         {
-            var size = Validation.Mapper.MapToType<Size>(json);
             var result = await _repository.InsertAsync(size);
-            return Result<int>.Success(result);
+            return Result.Success(result);
         }
         catch (Exception e)
         {
             _logger.Error("Size create failed. {0}", e.Message);
-            return Result<int>.Failure(e.Message);
+            return Result.Failure(SizeErrors.CreateFailed());
         }
     }
 
-    public async Task<Result<object>> UpdateSizeAsync(string json)
+    public async Task<Result> UpdateSizeAsync(Size size)
     {
         try
         {
-            var size = Validation.Mapper.MapToType<Size>(json);
             await _repository.UpdateAsync(size);
-            return Result<object>.Success();
+            return Result.Success();
         }
         catch (Exception e)
         {
             _logger.Error("Size update failed. {0}", e.Message);
-            return Result<object>.Failure(e.Message);
+            return Result.Failure(SizeErrors.UpdateFailed());
         }
     }
     
-    public async Task<Result<object>> DeleteSizeAsync(int id)
+    public async Task<Result> DeleteSizeAsync(int id)
     {
         try
         {
             await _repository.DeleteAsync(id);
-            return Result<object>.Success();
+            return Result.Success();
         }
         catch (Exception e)
         {
             _logger.Error("Size delete failed. {0}", e.Message);
-            return Result<object>.Failure(e.Message);
+            return Result.Failure(SizeErrors.DeleteFailed());
         }
     }
 

@@ -1,7 +1,8 @@
 ﻿using CrpgP.Application.Options;
-using CrpgP.Application.Result;
+using CrpgP.Domain;
 using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
+using CrpgP.Domain.Errors;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Serilog;
@@ -23,64 +24,64 @@ public class PortraitService
         _cacheHelper = new CacheHelper<Portrait>(cache, memoryCacheOptions.Value.EntryExpiryInSeconds);
     }
     
-    public async Task<Result<Portrait>> GetPortraitByIdAsync(int id)
+    public async Task<Result> GetPortraitByIdAsync(int id)
     {
         var portrait = _cacheEnabled 
             ? await _cacheHelper.GetEntryFromCacheOrRepository(id,() => _repository.FindByIdAsync(id))
             : await _repository.FindByIdAsync(id);
         return portrait is null 
-            ? Result<Portrait>.Failure($"Portrait with id: {id} was not found.")
-            : Result<Portrait>.Success(portrait);
+            ? Result.Failure(PortraitErrors.NotFound(id))
+            : Result.Success(portrait);
     }
 
-    public async Task<Result<Dictionary<int,Portrait?>>> GetPortraitsByIdsAsync(IEnumerable<int> ids)
+    public async Task<Result> GetPortraitsByIdsAsync(IEnumerable<int> ids)
     {
-        // NOTE: This is not using the cache
-        var portraits = await _repository.FindByIdsAsync(ids);
-        return Result<Dictionary<int,Portrait?>>.Success(portraits);
+        var portraitIds = ids as int[] ?? ids.ToArray();
+        var portraits = await _repository.FindByIdsAsync(portraitIds);
+        return portraits.Count > 0
+            ? Result.Success(portraits)
+            : Result.Failure(PortraitErrors.NoneFound(portraitIds));
     }
 
-    public async Task<Result<int>> CreatePortraitAsync(string json)
+    public async Task<Result> CreatePortraitAsync(Portrait portrait)
     {
         try
         {
-            var portrait = Validation.Mapper.MapToType<Portrait>(json);
             var result = await _repository.InsertAsync(portrait);
-            return Result<int>.Success(result);
+            return Result.Success(result);
         }
         catch (Exception e)
         {
             _logger.Error("Portrait create failed. {0}", e.Message);
-            return Result<int>.Failure(e.Message);
+            return Result.Failure(PortraitErrors.CreateFailed());
         }
     }
 
-    public async Task<Result<object>> UpdatePortraitAsync(string json)
+    public async Task<Result> UpdatePortraitAsync(Portrait portrait)
     {
         try
         {
-            var portrait = Validation.Mapper.MapToType<Portrait>(json);
             await _repository.UpdateAsync(portrait);
-            return Result<object>.Success();
+            return Result.Success();
         }
         catch (Exception e)
         {
             _logger.Error("Portrait update failed. {0}", e.Message);
-            return Result<object>.Failure(e.Message);
+            return Result.Failure(PortraitErrors.UpdateFailed());
         }
     }
     
-    public async Task<Result<object>> DeletePortraitAsync(int id)
+    public async Task<Result> DeletePortraitAsync(int id)
     {
         try
         {
             await _repository.DeleteAsync(id);
-            return Result<object>.Success();
+            return Result.Success();
         }
         catch (Exception e)
         {
             _logger.Error("Portrait delete failed. {0}", e.Message);
-            return Result<object>.Failure(e.Message);
+            return Result.Failure(PortraitErrors.DeleteFailed());
         }
     }
 

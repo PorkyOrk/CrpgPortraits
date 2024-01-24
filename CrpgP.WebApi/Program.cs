@@ -31,6 +31,6 @@ if (app.Environment.IsDevelopment())
 
 app.MapEndpoints();
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.Run();
