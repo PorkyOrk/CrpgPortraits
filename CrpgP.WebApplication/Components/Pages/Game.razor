@@ -1,12 +1,12 @@
-﻿@page "/game"
+﻿@page "/games"
 @using CrpgP.WebApplication.Models;
 @inject ApiService ApiService
 
-<PageTitle>Game</PageTitle>
+<PageTitle>Games</PageTitle>
 
 
 
-<h3>Game</h3>
+<h3>Games</h3>
 
 @if (_game != null)
 {
@@ -16,21 +16,14 @@
         <span>Portrait Height: @_game.PortraitSize.Height</span>
         <span>Tags: @_game.Tags</span>
     </div>
-
 }
 
 
-
-
-
 @code {
-
     private GameModel? _game;
 
     protected override async Task OnInitializedAsync()
     {
         _game = await ApiService.GetByIdAsync<GameModel>(1);
     }
-
-    
 }
