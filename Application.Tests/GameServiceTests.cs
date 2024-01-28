@@ -125,6 +125,7 @@ public class GameServiceTests
 
         // Assert
         sut.Should().Match<Result>(result => 
+
             result.IsSuccess == true
             && result.Value!.Equals(1));
     }
