@@ -1,38 +1,57 @@
 ﻿using System.Text.Json;
+using CrpgP.WebApplication.Models;
 
 namespace CrpgP.WebApplication;
 
 public class ApiService
 {
     private readonly HttpClient _httpClient;
+    private readonly string _baseUrl;
+    private readonly JsonSerializerOptions _jsonSerializerOptions;
+    private readonly Dictionary<Type, string> _typeSlugMap;
     
-    public ApiService(HttpClient httpClient)
+    public ApiService(HttpClient httpClient, IConfiguration configuration)
     {
         _httpClient = httpClient;
+        _baseUrl = configuration.GetSection("BackendApi:BaseUrl").Value ?? throw new ArgumentException("Missing Backend Url in configuration.");
+        _jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        _typeSlugMap = new Dictionary<Type, string>
+        {
+            { typeof(GameModel), "game" },
+            { typeof(PortraitModel), "portrait" },
+            { typeof(SizeModel), "size" },
+            { typeof(TagModel), "tag" }
+        };
+    }
+
+    private string GetSlugFromModelType<T>()
+    {
+        if (_typeSlugMap.TryGetValue(typeof(T), out var value))
+        {
+            return value;
+        }
+        throw new ArgumentException("No slug found for the specified type.");
+    }
+    
+    private async Task<T?> GetRequest<T>(string uri)
+    {
+        var response = await _httpClient.GetAsync(uri);
+        response.EnsureSuccessStatusCode();
+        
+        using var jsonDocument = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync());
+        var result = jsonDocument.RootElement.GetProperty("value").Deserialize<T>(_jsonSerializerOptions);
+        return result;
     }
     
     public async Task<T?> GetByIdAsync<T>(int id)
     {
-        var response = await _httpClient.GetAsync($"http://localhost:5100/api/v1/game?id={id}"); // TODO configure base URL
-        response.EnsureSuccessStatusCode();
-        
-        var responseBody = await response.Content.ReadAsStringAsync();
-
-        var options = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        };
-
-        using var jsonDocument = JsonDocument.Parse(responseBody);
-        // jsonDocument.RootElement.TryGetProperty("value", out var value);
-        // var deserialized = value.Deserialize<T>(options);
-
-        var myClass = jsonDocument.RootElement.GetProperty("value").Deserialize<T>(options);
-        
-        return myClass;
-
-
-        // TODO Add validation and logging
-
+        var uri = $"{_baseUrl}/api/v1/{GetSlugFromModelType<T>()}?id={id}";
+        return await GetRequest<T>(uri);
+    }
+    
+    public async Task<T?> GetAll<T>()
+    {
+        var uri = $"{_baseUrl}/api/v1/{GetSlugFromModelType<T>()}/all";
+        return await GetRequest<T>(uri);
     }
 }
