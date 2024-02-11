@@ -1,12 +1,69 @@
 ﻿@page "/"
+@using CrpgP.WebApplication.Components.Layout
+@layout HomeLayout
 
 <PageTitle>CRPG Portraits</PageTitle>
 
-<h1>CRPG Portraits</h1>
 
-<h4>Collection of fantasy portraits for customizing your CPRG party</h4>
+<div class="banner">
+    <img class="banner-image" src="images/banner/tmp_banner.png" alt="Banner image">
+</div>
+
+
+<div class="">
+    @* Nav menu for home page *@
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="navbar-nav">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="#">
+                    @* <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> *@
+                    Home
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="portraits">
+                    @* <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> *@
+                    Portraits
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="games">
+                    @* <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> *@
+                    Games
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="tags">
+                    @* <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> *@
+                    Tags
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="sizes">
+                    @* <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> *@
+                    Sizes
+                </NavLink>
+            </div>
+        </div>
+    </nav>
+</div>
+
+@* <h1>CRPG Portraits</h1> *@
+@* <h4>Collection of fantasy portraits for customizing your CPRG party</h4> *@
+<div class="">
+    <h3>Front Page Content</h3>
+    <span>Display some portraits here.</span>
+    <span>Maybe some quick controls, like game selection.</span>
+</div>
+
+
+
+
+
+
+
 
 @code
 {
-    
+
 }

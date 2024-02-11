@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using CrpgP.WebApplication.Models;
 
-namespace CrpgP.WebApplication;
+namespace CrpgP.WebApplication.Services;
 
 public class ApiService
 {
