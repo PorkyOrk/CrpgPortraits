@@ -1,5 +1,8 @@
-﻿using System.Text.Json;
+﻿using System.Collections;
+using System.Collections.ObjectModel;
+using System.Text.Json;
 using CrpgP.WebApplication.Models;
+using Microsoft.VisualBasic;
 
 namespace CrpgP.WebApplication.Services;
 
@@ -49,9 +52,49 @@ public class ApiService
         return await GetRequest<T>(uri);
     }
     
-    public async Task<T?> GetAll<T>()
+    public async Task<IEnumerable<T>?> GetAll<T>()
     {
         var uri = $"{_baseUrl}/api/v1/{GetSlugFromModelType<T>()}/all";
-        return await GetRequest<T>(uri);
+        return await GetRequest<IEnumerable<T>?>(uri);
     }
+    
+    
+    
+    
+    private async Task<IEnumerable<int>?> GetAllIds<T>()
+    {
+        var uri = $"{_baseUrl}/api/v1/{GetSlugFromModelType<T>()}/ids";
+        return await GetRequest<IEnumerable<int>?>(uri);
+    }
+    
+    // TODO: Consider refactor to its own, non-generic class
+    public async Task<IEnumerable<GameModel>> GetAllGames()
+    {
+        var ids = await GetAllIds<GameModel>();
+        if (ids == null)
+        {
+            // TODO Throw exception
+            throw new NullReferenceException("No game ids found.");
+        }
+
+        var games = new Collection<GameModel>();
+        
+        foreach (var id in ids)
+        {
+            var game = await GetByIdAsync<GameModel>(id);
+            if (game != null)
+            {
+                games.Add(game);
+            }
+        }
+
+        if (games.Count == 0 )
+        {
+            //TODO Log error, maybe throw exception
+        }
+        
+        return games;
+    }
+    
+    
 }

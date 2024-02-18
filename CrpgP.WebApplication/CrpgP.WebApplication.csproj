@@ -17,4 +17,8 @@
       <ProjectReference Include="..\CrpgP.Domain\CrpgP.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Components\Parts\" />
+    </ItemGroup>
+
 </Project>

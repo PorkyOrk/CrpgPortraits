@@ -5,9 +5,15 @@
     width: 100%;
     height: auto;
     background-color: black;
-    
-    &-image{
-        
-    }
 }
 
+.navbar-horizontal-always {
+    flex-direction: row;
+}
+
+.content {
+    
+    .content-body {
+        margin: 0 45px;
+    }
+}

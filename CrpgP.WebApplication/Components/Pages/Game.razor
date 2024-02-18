@@ -1,30 +1,22 @@
-﻿@page "/games"
+﻿@page "/game/{Id:int}"
 @using CrpgP.WebApplication.Models;
 @using CrpgP.WebApplication.Services
 @inject ApiService ApiService
 
-<PageTitle>Games</PageTitle>
+<h3>Game Page</h3>
 
-
-
-<h3>Games</h3>
-
-@if (_game != null)
-{
-    <div>
-        <span>Game Name: @_game.Name</span>
-        <span>Portrait Width: @_game.PortraitSize.Width</span>
-        <span>Portrait Height: @_game.PortraitSize.Height</span>
-        <span>Tags: @_game.Tags</span>
-    </div>
-}
-
+<p>Game id: @Id</p>
 
 @code {
+    [Parameter]
+    public int Id { get; set; }
+
     private GameModel? _game;
+
 
     protected override async Task OnInitializedAsync()
     {
-        _game = await ApiService.GetByIdAsync<GameModel>(1);
+        _game = await ApiService.GetByIdAsync<GameModel>(Id);
     }
+
 }

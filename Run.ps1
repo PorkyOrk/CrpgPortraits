@@ -6,7 +6,6 @@ $web_path = -join($base_path, "\CrpgP.WebApplication");
 $db_container_name = "db-postgres";
 
 
-# Print 
 Write-Host "Starting local dev environment";
 Write-Host " Database container name:   $db_container_name";
 Write-Host " WebApi path:               $api_path";

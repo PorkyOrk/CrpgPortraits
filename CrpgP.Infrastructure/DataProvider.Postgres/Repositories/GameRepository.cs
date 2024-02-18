@@ -13,6 +13,18 @@ public class GameRepository : RepositoryBase, IGameRepository
     {
     }
     
+    public async Task<IEnumerable<int>?> FindAllIdsAsync()
+    {
+        await using var cnn = await DataSource.OpenConnectionAsync();
+        const string sql = "SELECT id FROM games;";
+
+        var gameIds = cnn.QueryAsync<int>(sql)
+            .GetAwaiter()
+            .GetResult();
+
+        return gameIds;
+    }
+
     public async Task<Game?> FindByIdAsync(int gameId)
     {
         await using var cnn = await DataSource.OpenConnectionAsync();

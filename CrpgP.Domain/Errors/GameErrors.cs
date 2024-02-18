@@ -2,6 +2,10 @@
 
 public static class GameErrors
 {
+    public static Error NoneFound()
+    {
+        return Error.NotFound("Game.NoneFound", "No games found.");
+    }
     public static Error NotFound(int gameId)
     {
         return Error.NotFound("Game.NotFound", $"The game with id = '{gameId}' was not found");

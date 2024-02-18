@@ -1,0 +1,19 @@
+﻿
+<div class="content-box">
+    <h3>ContentBox</h3>
+    <p>
+        name: @DisplayName <br>
+        imagePath: @ImagePath <br>
+        slug: @Slug <br>
+    </p>
+</div>
+
+
+@code {
+    [Parameter]
+    public required string DisplayName { get; set; }
+    [Parameter]
+    public required string ImagePath { get; set; }
+    [Parameter]
+    public required string Slug { get; set; }
+}

@@ -1,0 +1,30 @@
+﻿
+.footer {
+    
+    .footer-content-wrapper {
+        color: lightgray;
+        margin-top: 15px;
+        margin-left: 45px;
+        margin-right: 45px;
+        padding: 30px;
+        display: flex;
+    }
+    
+    .footer-content {
+        width: 50%;
+        margin: 0 40px;
+        
+        .nav-link {
+            text-decoration: none;
+            color: lightgray;
+            padding: 0;
+        }
+    }
+    
+    .footer-bottom {
+        padding: 8px;
+        display: block;
+        color: #5e5e5e;
+        text-align: center;
+    }
+}

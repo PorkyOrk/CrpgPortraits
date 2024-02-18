@@ -34,6 +34,16 @@ public class GameService
             ? Result.Failure(GameErrors.NotFound(id))
             : Result.Success(game);
     }
+
+    public async Task<Result> GetAllIds()
+    {
+
+        var gameIds = await _repository.FindAllIdsAsync();
+        
+        return gameIds is null 
+            ? Result.Failure(GameErrors.NoneFound())
+            : Result.Success(gameIds);
+    }
     
     public async Task<Result> GetGameByNameAsync(string name)
     {

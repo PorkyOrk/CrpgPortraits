@@ -1,69 +1,81 @@
 ﻿@page "/"
 @using CrpgP.WebApplication.Components.Layout
+@using CrpgP.WebApplication.Models
+@using CrpgP.WebApplication.Services
 @layout HomeLayout
+@inject ApiService ApiService
 
 <PageTitle>CRPG Portraits</PageTitle>
 
 
 <div class="banner">
-    <img class="banner-image" src="images/banner/tmp_banner.png" alt="Banner image">
+    <img class="banner-image" src="images/tmp_banner.png" alt="Banner image">
 </div>
 
 
-<div class="">
-    @* Nav menu for home page *@
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="navbar-nav">
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="#">
-                    @* <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> *@
-                    Home
-                </NavLink>
+<div class="navigation">
+    <NavMenu/>
+</div>
+
+
+<div class="content">
+    <div class="content-body">
+        
+        <div class="content-section welcome">
+            <h2>Welcome</h2>
+            <p>
+                Welcome to CRPG Portraits, a site dedicated for fans of the crpg game genre. Here you can find a portrait
+                that fits your character just right, for a more immersive role playing experience in your adventure.
+            </p>
+        </div>
+
+        <div class="content-section featured">
+            <div class="section-title">
+                <h2>Featured Portraits</h2>
             </div>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="portraits">
-                    @* <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> *@
-                    Portraits
-                </NavLink>
-            </div>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="games">
-                    @* <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> *@
-                    Games
-                </NavLink>
-            </div>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="tags">
-                    @* <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> *@
-                    Tags
-                </NavLink>
-            </div>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="sizes">
-                    @* <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> *@
-                    Sizes
-                </NavLink>
+            <div class="featured-portraits-grid">
+                <p>
+                    <em>Loading...</em>
+                </p>
             </div>
         </div>
-    </nav>
+        
+        <div class="content-section games">
+            <div class="section-title">
+                <h2>Games</h2>
+            </div>
+            
+            <div class="games-grid">
+                @if (_games == null)
+                {
+                    <p>
+                        <em>Loading...</em>
+                    </p>
+                }
+                else
+                {
+                    foreach (var game in _games)
+                    {
+                        <ContentBox
+                            DisplayName=@game.Name
+                            Slug="slug"
+                            ImagePath="path"/>
+                    }
+                }
+
+            </div>
+        </div>
+    </div>
 </div>
-
-@* <h1>CRPG Portraits</h1> *@
-@* <h4>Collection of fantasy portraits for customizing your CPRG party</h4> *@
-<div class="">
-    <h3>Front Page Content</h3>
-    <span>Display some portraits here.</span>
-    <span>Maybe some quick controls, like game selection.</span>
-</div>
-
-
-
-
-
-
 
 
 @code
 {
+    private IEnumerable<GameModel>? _games;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _games = await ApiService.GetAllGames();
+    }
 
 }

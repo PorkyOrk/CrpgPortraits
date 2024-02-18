@@ -19,6 +19,12 @@ public static class GameEndpoints
             return result.IsSuccess ? Results.Ok(result) : result.ToProblemDetails();
         });
         
+        app.MapGet("api/v1/game/ids", async Task<IResult>() =>
+        {
+            var result =  await gameService.GetAllIds();
+            return result.IsSuccess ? Results.Ok(result) : result.ToProblemDetails();
+        });
+        
         app.MapGet("api/v1/game/find", async Task<IResult>([FromQuery(Name="name")] string name) =>
         {
             var result = await gameService.GetGameByNameAsync(name);
