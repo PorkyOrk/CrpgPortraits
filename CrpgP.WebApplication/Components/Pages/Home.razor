@@ -29,40 +29,60 @@
             </p>
         </div>
 
-        <div class="content-section featured">
+        <div class="content-section portraits">
             <div class="section-title">
                 <h2>Featured Portraits</h2>
             </div>
-            <div class="featured-portraits-grid">
-                <p>
-                    <em>Loading...</em>
-                </p>
+            <div class="featured-grid container-fluid">
+                @if (_featuredPortraits == null)
+                {
+                    <p>
+                        <em>Loading Portraits...</em>
+                    </p>
+                }
+                else
+                {
+                    <div class="row">
+                        @foreach (var portrait in _featuredPortraits)
+                        {
+                            <div class="col-md-2">
+                                <ContentBoxPortrait
+                                    DisplayName=@portrait.DisplayName
+                                    Slug="slug"
+                                    ImagePath="path"/>
+                            </div>
+                        }
+                    </div>
+                }
             </div>
         </div>
         
         <div class="content-section games">
             <div class="section-title">
-                <h2>Games</h2>
+                <h2>Featured Games</h2>
             </div>
             
-            <div class="games-grid">
+            <div class="featured-grid container-fluid">
                 @if (_games == null)
                 {
                     <p>
-                        <em>Loading...</em>
+                        <em>Loading Games...</em>
                     </p>
                 }
                 else
                 {
-                    foreach (var game in _games)
-                    {
-                        <ContentBox
-                            DisplayName=@game.Name
-                            Slug="slug"
-                            ImagePath="path"/>
-                    }
+                    <div class="row">
+                        @foreach (var game in _games)
+                        {
+                            <div class="col-md-2">
+                                <ContentBoxGame
+                                    DisplayName=@game.Name
+                                    Slug="slug"
+                                    ImagePath="path"/>
+                            </div>
+                        }
+                    </div>
                 }
-
             </div>
         </div>
     </div>
@@ -72,10 +92,35 @@
 @code
 {
     private IEnumerable<GameModel>? _games;
+    private IEnumerable<PortraitModel>? _featuredPortraits;
 
+    private int[] _portraitIds = [12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12];
+    
+    
     protected override async Task OnInitializedAsync()
+    {
+        await LoadGames();
+        await LoadPortraits(_portraitIds);
+    }
+    
+    private async Task LoadGames()
     {
         _games = await ApiService.GetAllGames();
     }
+    
+    private async Task LoadPortraits(int[] ids)
+    {
+        var result = new List<PortraitModel>();
 
+        foreach (var id in ids)
+        {
+            var p = await ApiService.GetByIdAsync<PortraitModel>(id);
+            if (p != null)
+            {
+                result.Add(p);
+            }
+        }
+        
+        _featuredPortraits = result;
+    }
 }

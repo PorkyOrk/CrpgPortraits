@@ -9,7 +9,7 @@ public class PortraitModel
     
     public int Id { get; init; }
     public required string FileName { get; init; }
-    public required SizeModel SizeModel { get; init; }
+    public SizeModel? SizeModel { get; init; }
     public string? DisplayName { get; init; }
     public string? Description { get; init; }
     public IEnumerable<TagModel> Tags { get; init; } = new List<TagModel>();

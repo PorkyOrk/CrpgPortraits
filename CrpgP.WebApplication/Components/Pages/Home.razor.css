@@ -1,6 +1,10 @@
 ﻿
 
 
+.featured-grid {
+    
+}
+
 .banner {
     width: 100%;
     height: auto;
@@ -15,5 +19,16 @@
     
     .content-body {
         margin: 0 45px;
+        
+        .content-section {
+            
+            .featured-grid {
+                display: grid;
+                
+                .content-box {
+                    
+                }
+            }
+        }
     }
 }
