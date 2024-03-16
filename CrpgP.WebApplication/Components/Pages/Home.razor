@@ -45,21 +45,22 @@
                     <div class="row">
                         @foreach (var portrait in _featuredPortraits)
                         {
-                            <div class="col-md-2">
-                                <ContentBoxPortrait
-                                    DisplayName=@portrait.DisplayName
-                                    Slug="slug"
-                                    ImagePath="path"/>
+                            <div class="col-md-3 portrait-box">
+                                <a href="/portrait/@portrait.Id">
+                                    <ContentBoxPortrait
+                                        DisplayName=@portrait.DisplayName
+                                        Slug="slug"
+                                        ImagePath="path"/>
+                                </a>
                             </div>
                         }
                     </div>
                 }
             </div>
         </div>
-        
         <div class="content-section games">
             <div class="section-title">
-                <h2>Featured Games</h2>
+                <h2>Games</h2>
             </div>
             
             <div class="featured-grid container-fluid">
@@ -74,11 +75,13 @@
                     <div class="row">
                         @foreach (var game in _games)
                         {
-                            <div class="col-md-2">
-                                <ContentBoxGame
-                                    DisplayName=@game.Name
-                                    Slug="slug"
-                                    ImagePath="path"/>
+                            <div class="col-md-2 portrait-box">
+                                <a href="/game/@game.Id">
+                                    <ContentBoxGame
+                                        DisplayName=@game.Name
+                                        Slug="slug"
+                                        ImagePath="path"/>
+                                </a>
                             </div>
                         }
                     </div>

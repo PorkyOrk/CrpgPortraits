@@ -19,16 +19,26 @@
     
     .content-body {
         margin: 0 45px;
-        
-        .content-section {
-            
-            .featured-grid {
-                display: grid;
-                
-                .content-box {
-                    
-                }
-            }
+    }
+}
+
+.portrait-box {
+    padding: 12px;
+}
+
+.game-box {
+    padding: 12px;
+}
+
+.featured-grid {
+    display: grid;
+
+    .content-box {
+        text-align: center;
+
+        .image {
+            width: 100%;
+            height: auto;
         }
     }
 }

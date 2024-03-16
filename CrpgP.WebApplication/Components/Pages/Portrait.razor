@@ -1,0 +1,21 @@
+﻿@page "/portrait/{Id:int}"
+@using CrpgP.WebApplication.Models;
+@using CrpgP.WebApplication.Services
+@inject ApiService ApiService
+
+<h3>Portrait Page</h3>
+
+<p>Portrait id: @Id</p>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private PortraitModel? _portrait;
+
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _portrait = await ApiService.GetByIdAsync<PortraitModel>(Id);
+    }
+}

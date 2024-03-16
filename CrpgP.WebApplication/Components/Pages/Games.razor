@@ -20,7 +20,7 @@ else
         @game.Name
         <br>
         
-        <ContentBox
+        <ContentBoxGame
             DisplayName=@game.Name
             Slug="slug"
             ImagePath="path"
@@ -28,18 +28,9 @@ else
     }
 }
 
-@* @if (_game != null) *@
-@* { *@
-@*     <div> *@
-@*         <span>Game Name: @_game.Name</span> *@
-@*         <span>Portrait Width: @_game.PortraitSize.Width</span> *@
-@*         <span>Portrait Height: @_game.PortraitSize.Height</span> *@
-@*         <span>Tags: @_game.Tags</span> *@
-@*     </div> *@
-@* } *@
 
-
-@code {
+@code
+{
     private IEnumerable<GameModel>? _games;
 
     protected override async Task OnInitializedAsync()
