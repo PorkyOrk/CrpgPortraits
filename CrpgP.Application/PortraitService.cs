@@ -42,6 +42,26 @@ public class PortraitService
             ? Result.Success(portraits)
             : Result.Failure(PortraitErrors.NoneFound(portraitIds));
     }
+    
+    public async Task<Result> GetPortraitsCount()
+    {
+        var count = await _repository.CountAll();
+        
+        return count == 0 
+            ? Result.Failure(PortraitErrors.CountIsZero())
+            : Result.Success(count);
+    }
+
+    public async Task<Result> GetPortraitsPage(int page, int count)
+    {
+        // TODO Cache
+        
+        var portraits = await _repository.FindAllPage(page, count);
+        
+        return portraits is null
+            ? Result.Failure(PortraitErrors.PagePortraitsNotFound(page))
+            : Result.Success(portraits);
+    }
 
     public async Task<Result> CreatePortraitAsync(Portrait portrait)
     {

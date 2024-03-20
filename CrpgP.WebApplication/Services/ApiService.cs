@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Text.Json;
 using CrpgP.WebApplication.Models;
-using Microsoft.VisualBasic;
 
 namespace CrpgP.WebApplication.Services;
 
@@ -23,7 +21,8 @@ public class ApiService
             { typeof(GameModel), "game" },
             { typeof(PortraitModel), "portrait" },
             { typeof(SizeModel), "size" },
-            { typeof(TagModel), "tag" }
+            { typeof(TagModel), "tag" },
+            { typeof(IEnumerable<PortraitModel>), "portrait" }
         };
     }
 
@@ -58,7 +57,17 @@ public class ApiService
         return await GetRequest<IEnumerable<T>?>(uri);
     }
     
+    public async Task<IEnumerable<T>?> GetAllPaginated<T>(int page, int itemsPerPage)
+    {
+        var uri = $"{_baseUrl}/api/v1/{GetSlugFromModelType<T>()}/all?page={page}&count={itemsPerPage}";
+        return await GetRequest<IEnumerable<T>?>(uri);
+    }
     
+    public async Task<int> GetCount<T>()
+    {
+        var uri = $"{_baseUrl}/api/v1/{GetSlugFromModelType<T>()}/all/count";
+        return await GetRequest<int>(uri);
+    }
     
     
     private async Task<IEnumerable<int>?> GetAllIds<T>()
@@ -95,6 +104,4 @@ public class ApiService
         
         return games;
     }
-    
-    
 }

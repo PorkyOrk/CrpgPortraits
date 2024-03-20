@@ -6,9 +6,18 @@
 }
 
 .banner {
-    width: 100%;
-    height: auto;
+    /*width: 100%;*/
+    /*height: auto;*/
     background-color: black;
+    
+    .banner-image {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 50%;
+        max-height: 220px;
+        max-width: 555px;
+    }
 }
 
 .navbar-horizontal-always {

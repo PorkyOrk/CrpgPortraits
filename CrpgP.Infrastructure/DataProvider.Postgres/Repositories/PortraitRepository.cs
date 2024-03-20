@@ -52,6 +52,34 @@ public class PortraitRepository : RepositoryBase, IPortraitRepository
         return portraits;
     }
 
+    public async Task<int> CountAll()
+    {
+        await using var cnn = await DataSource.OpenConnectionAsync();
+        const string sql = "SELECT COUNT(*) FROM portraits";
+        var count = await cnn.QuerySingleAsync<int>(sql);
+        return count;
+    }
+
+    public async Task<IEnumerable<Portrait>?> FindAllPage(int page, int count)
+    {
+        await using var cnn = await DataSource.OpenConnectionAsync();
+        var parameters = new { Offset = page * count, Count = count };
+        const string sql = 
+            "SELECT * FROM portraits " +
+            "LEFT JOIN sizes ON portraits.size_id = sizes.id " +
+            "ORDER BY portraits.id " +
+            "OFFSET @Offset ROWS " +
+            "FETCH NEXT @Count ROWS ONLY";
+        var portraits = cnn.QueryAsync<Portrait, Size, Portrait>(sql, (portrait, size) =>
+        {
+            portrait.Size = size;
+            return portrait;
+        }, parameters)
+            .GetAwaiter()
+            .GetResult();
+        return portraits;
+    }
+
     public async Task<int> InsertAsync(Portrait portrait)
     {
         await using var cnn = await DataSource.OpenConnectionAsync();

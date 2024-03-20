@@ -1,9 +1,66 @@
 ﻿@page "/portraits"
+@using CrpgP.WebApplication.Models
+@using CrpgP.WebApplication.Services
+@inject ApiService ApiService
 
 <PageTitle>Portraits</PageTitle>
 
 <h3>Portraits</h3>
 
+<div class="content-section portraits">
+    <div class="section-title">
+        <h2>Featured Portraits</h2>
+    </div>
+    <div class="featured-grid container-fluid">
+        @if (_portraits == null)
+        {
+            <p>
+                <em>Loading Portraits...</em>
+            </p>
+        }
+        else
+        {
+            <div class="row">
+                @foreach (var portrait in _portraits)
+                {
+                    <div class="col-md-3 portrait-box">
+                        <a href="/portrait/@portrait.Id">
+                            <ContentBoxPortrait
+                                DisplayName=@portrait.DisplayName
+                                Slug="slug"
+                                ImagePath="path"/>
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+
+
 @code {
-    
+    private IEnumerable<PortraitModel>? _portraits;
+
+    private int _count;
+    private const int ItemsPerPage = 8;
+    private int _currentPage = 0;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetAllPortraitCount();
+        await LoadPortraits();
+    }
+
+    private async Task LoadPortraits()
+    {
+        _portraits = await ApiService.GetAllPaginated<PortraitModel>(_currentPage, ItemsPerPage);
+    }
+
+    private async Task GetAllPortraitCount()
+    {
+        _count = await ApiService.GetCount<PortraitModel>();
+    }
+
 }
