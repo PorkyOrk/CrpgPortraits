@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 
-namespace CrpgP.Application;
+namespace CrpgP.Application.Cache;
 
+[Obsolete("Use CacheService instead.")]
 public class CacheHelper<T>
 {
     private readonly IMemoryCache _cache;

@@ -1,11 +1,9 @@
 ﻿using CrpgP.Application;
-using CrpgP.Application.Options;
+using CrpgP.Application.Cache;
 using CrpgP.Domain;
 using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
 using CrpgP.Domain.Errors;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using NSubstitute.ReturnsExtensions;
 using Serilog;
 
@@ -14,16 +12,11 @@ namespace Application.UnitTests;
 public class TagServiceTests
 {
     private ITagRepository _mockRepository = null!;
-    private IOptions<MemoryCacheOptions> _mockIOption = null!;
 
     [SetUp]
     public void Setup()
     {
         _mockRepository = Substitute.For<ITagRepository>();
-        _mockIOption = Substitute.For<IOptions<MemoryCacheOptions>>();
-        
-        // Cache disabled by default
-        _mockIOption.Value.Returns(new MemoryCacheOptions { Enabled = false, EntryExpiryInSeconds = 1 });
     }
     
     [Test]
@@ -33,9 +26,8 @@ public class TagServiceTests
         var tag = new Tag {Name = "Test Tag"};
         _mockRepository.FindByIdAsync(1).ReturnsForAnyArgs(tag);
         var tagService = new TagService(
-            _mockIOption,
             _mockRepository,
-            Substitute.For<IMemoryCache>(),
+            Substitute.For<ICacheService>(),
             Substitute.For<ILogger>());
 
         // Act
@@ -53,11 +45,9 @@ public class TagServiceTests
         // Arrange
         var tag = new Tag {Name = "Test Tag"};
         _mockRepository.FindByNameAsync("Test Tag").ReturnsForAnyArgs(tag);
-        _mockIOption.Value.Returns(new MemoryCacheOptions { Enabled = false, EntryExpiryInSeconds = 1 });
         var tagService = new TagService(
-            _mockIOption,
             _mockRepository,
-            Substitute.For<IMemoryCache>(),
+            Substitute.For<ICacheService>(),
             Substitute.For<ILogger>());
         
         // Act
@@ -72,11 +62,9 @@ public class TagServiceTests
     {
         // Arrange
         _mockRepository.FindByNameAsync("Test Tag").ReturnsNullForAnyArgs();
-        _mockIOption.Value.Returns(new MemoryCacheOptions { Enabled = false, EntryExpiryInSeconds = 1 });
         var tagService = new TagService(
-            _mockIOption,
             _mockRepository,
-            Substitute.For<IMemoryCache>(),
+            Substitute.For<ICacheService>(),
             Substitute.For<ILogger>());
         
         // Act
@@ -94,9 +82,8 @@ public class TagServiceTests
         _mockRepository.InsertAsync(tag).ReturnsForAnyArgs(1);
         
         var tagService = new TagService(
-            _mockIOption,
             _mockRepository,
-            Substitute.For<IMemoryCache>(),
+            Substitute.For<ICacheService>(),
             Substitute.For<ILogger>());
         
         // Act
@@ -111,9 +98,8 @@ public class TagServiceTests
     {
         // Arrange
         var tagService = new TagService(
-            _mockIOption,
             _mockRepository,
-            Substitute.For<IMemoryCache>(),
+            Substitute.For<ICacheService>(),
             Substitute.For<ILogger>());
         
         // Act

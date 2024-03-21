@@ -1,10 +1,8 @@
-﻿using CrpgP.Application.Options;
+﻿using CrpgP.Application.Cache;
 using CrpgP.Domain;
 using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
 using CrpgP.Domain.Errors;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace CrpgP.Application;
@@ -13,22 +11,19 @@ public class SizeService
 {
     private readonly ISizeRepository _repository;
     private readonly ILogger _logger;
-    private readonly bool _cacheEnabled;
-    private readonly CacheHelper<Size> _cacheHelper;
-    
-    public SizeService(IOptions<MemoryCacheOptions> memoryCacheOptions, ISizeRepository repository, IMemoryCache cache, ILogger logger)
+    private readonly ICacheService _cacheService;
+
+
+    public SizeService(ISizeRepository repository, ICacheService cacheService, ILogger logger)
     {
         _repository = repository;
         _logger = logger;
-        _cacheEnabled = memoryCacheOptions.Value.Enabled;
-        _cacheHelper = new CacheHelper<Size>(cache, memoryCacheOptions.Value.EntryExpiryInSeconds);
+        _cacheService = cacheService;
     }
     
     public async Task<Result> GetSizeByIdAsync(int id)
     {
-        var size = _cacheEnabled 
-            ? await _cacheHelper.GetEntryFromCacheOrRepository(id, () => _repository.FindByIdAsync(id))
-            : await _repository.FindByIdAsync(id);
+        var size = await _cacheService.GetOrFetchEntryAsync($"size-{id}", () => _repository.FindByIdAsync(id));
         return size is null 
             ? Result.Failure(SizeErrors.NotFound(id))
             : Result.Success(size);
@@ -36,7 +31,8 @@ public class SizeService
 
     public async Task<Result> GetSizeByDimensionsAsync(int width, int height)
     {
-        var sizes = await _repository.FindByDimensionsAsync(width, height);
+        var sizes = await _cacheService.GetOrFetchEntryAsync($"sizes-w{width}h{height}",
+            () => _repository.FindByDimensionsAsync(width, height));
         return sizes is null 
             ? Result.Failure(SizeErrors.NotFoundByDimensions(width,height))
             : Result.Success(sizes);
@@ -60,6 +56,7 @@ public class SizeService
     {
         try
         {
+            _cacheService.RemoveEntry($"size-{size.Id}");
             await _repository.UpdateAsync(size);
             return Result.Success();
         }
@@ -74,6 +71,7 @@ public class SizeService
     {
         try
         {
+            _cacheService.RemoveEntry($"size-{id}");
             await _repository.DeleteAsync(id);
             return Result.Success();
         }

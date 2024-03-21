@@ -1,10 +1,8 @@
-﻿using CrpgP.Application.Options;
+﻿using CrpgP.Application.Cache;
 using CrpgP.Domain;
 using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
 using CrpgP.Domain.Errors;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace CrpgP.Application;
@@ -13,23 +11,18 @@ public class GameService
 {
     private readonly IGameRepository _repository;
     private readonly ILogger _logger;
-    private readonly bool _cacheEnabled;
-    private readonly CacheHelper<Game> _cacheHelper;
+    private readonly ICacheService _cacheService;
 
-    public GameService(IOptions<MemoryCacheOptions> memoryCacheOptions, IGameRepository repository, IMemoryCache cache, ILogger logger)
+    public GameService(IGameRepository repository, ICacheService cacheService, ILogger logger)
     {
         _repository = repository;
         _logger = logger;
-        _cacheEnabled = memoryCacheOptions.Value.Enabled;
-        _cacheHelper = new CacheHelper<Game>(cache, memoryCacheOptions.Value.EntryExpiryInSeconds);
+        _cacheService = cacheService;
     }
     
     public async Task<Result> GetGameByIdAsync(int id)
     {
-        var game = _cacheEnabled
-            ? await _cacheHelper.GetEntryFromCacheOrRepository(id, () => _repository.FindByIdAsync(id))
-            : await _repository.FindByIdAsync(id);
-        
+        var game = await _cacheService.GetOrFetchEntryAsync($"game-{id}", () => _repository.FindByIdAsync(id));
         return game is null 
             ? Result.Failure(GameErrors.NotFound(id))
             : Result.Success(game);
@@ -37,9 +30,7 @@ public class GameService
 
     public async Task<Result> GetAllIds()
     {
-
-        var gameIds = await _repository.FindAllIdsAsync();
-        
+        var gameIds = await _cacheService.GetOrFetchEntryAsync("game-ids", () => _repository.FindAllIdsAsync());
         return gameIds is null 
             ? Result.Failure(GameErrors.NoneFound())
             : Result.Success(gameIds);
@@ -47,9 +38,7 @@ public class GameService
     
     public async Task<Result> GetGameByNameAsync(string name)
     {
-        var game = _cacheEnabled 
-            ? await _cacheHelper.GetEntryFromCacheOrRepository(name, () => _repository.FindByNameAsync(name))
-            : await _repository.FindByNameAsync(name);
+        var game = await _cacheService.GetOrFetchEntryAsync($"game-{name}", () => _repository.FindByNameAsync(name));
         return game is null
             ? Result.Failure(GameErrors.NotFoundByName(name))
             : Result.Success(game);
@@ -73,6 +62,7 @@ public class GameService
     {
         try
         {
+            _cacheService.RemoveEntry($"game-{game.Id}");
             await _repository.UpdateAsync(game);
             return Result.Success();
         }
@@ -87,6 +77,7 @@ public class GameService
     {
         try
         {
+            _cacheService.RemoveEntry($"game-{id}");
             await _repository.DeleteAsync(id);
             return Result.Success();
         }

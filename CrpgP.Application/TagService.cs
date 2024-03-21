@@ -1,10 +1,8 @@
-﻿using CrpgP.Application.Options;
+﻿using CrpgP.Application.Cache;
 using CrpgP.Domain;
 using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
 using CrpgP.Domain.Errors;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace CrpgP.Application;
@@ -13,23 +11,18 @@ public class TagService
 {
     private readonly ITagRepository _repository;
     private readonly ILogger _logger;
-    private readonly bool _cacheEnabled;
-    private readonly CacheHelper<Tag> _cacheHelper;
+    private readonly ICacheService _cacheService;
 
-    public TagService(
-        IOptions<MemoryCacheOptions> memoryCacheOptions, ITagRepository repository, IMemoryCache cache, ILogger logger)
+    public TagService(ITagRepository repository, ICacheService cacheService, ILogger logger)
     {
         _repository = repository;
         _logger = logger;
-        _cacheEnabled = memoryCacheOptions.Value.Enabled;
-        _cacheHelper = new CacheHelper<Tag>(cache, memoryCacheOptions.Value.EntryExpiryInSeconds);
+        _cacheService = cacheService;
     }
     
     public async Task<Result> GetTagByIdAsync(int id)
     {
-        var tag = _cacheEnabled
-            ? await _cacheHelper.GetEntryFromCacheOrRepository(id, () => _repository.FindByIdAsync(id))
-            : await _repository.FindByIdAsync(id);
+        var tag = await _cacheService.GetOrFetchEntryAsync($"tag-{id}", () => _repository.FindByIdAsync(id));
         return tag is null 
             ? Result.Failure(TagErrors.NotFound(id))
             : Result.Success(tag);
@@ -37,9 +30,7 @@ public class TagService
     
     public async Task<Result> GetTagByNameAsync(string name)
     {
-        var tag = _cacheEnabled
-        ? await _cacheHelper.GetEntryFromCacheOrRepository(name, () => _repository.FindByNameAsync(name))
-        : await _repository.FindByNameAsync(name);
+        var tag = await _cacheService.GetOrFetchEntryAsync($"tag-{name}", () => _repository.FindByNameAsync(name));
         return tag is null
             ? Result.Failure(TagErrors.NotFoundByName(name))
             : Result.Success(tag);
@@ -64,6 +55,7 @@ public class TagService
     {
         try
         {
+            _cacheService.RemoveEntry($"tag-{id}");
             await _repository.DeleteAsync(id);
             _logger.Information("Tag successfully deleted.");
             return Result.Success();

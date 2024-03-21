@@ -1,12 +1,9 @@
-﻿using System.Text.Json;
-using CrpgP.Application;
-using CrpgP.Application.Options;
+﻿using CrpgP.Application;
+using CrpgP.Application.Cache;
 using CrpgP.Domain;
 using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
 using CrpgP.Domain.Errors;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using NSubstitute.ReturnsExtensions;
 using Serilog;
 
@@ -15,16 +12,11 @@ namespace Application.UnitTests;
 public class SizeServiceTests
 {
     private ISizeRepository _mockRepository = null!;
-    private IOptions<MemoryCacheOptions> _mockIOption = null!;
 
     [SetUp]
     public void Setup()
     {
         _mockRepository = Substitute.For<ISizeRepository>();
-        _mockIOption = Substitute.For<IOptions<MemoryCacheOptions>>();
-        
-        // Cache disabled by default
-        _mockIOption.Value.Returns(new MemoryCacheOptions { Enabled = false, EntryExpiryInSeconds = 1 });
     }
 
     [Test]
@@ -34,9 +26,8 @@ public class SizeServiceTests
         var size = new Size();
         _mockRepository.FindByIdAsync(1).ReturnsForAnyArgs(size);
         var sizeService = new SizeService(
-            _mockIOption,
             _mockRepository,
-            Substitute.For<IMemoryCache>(),
+            Substitute.For<ICacheService>(),
             Substitute.For<ILogger>());
         
         // Act
@@ -55,9 +46,8 @@ public class SizeServiceTests
         var size = new List<Size> { new() };
         _mockRepository.FindByDimensionsAsync(100,200).ReturnsForAnyArgs(size);
         var sizeService = new SizeService(
-            _mockIOption,
             _mockRepository,
-            Substitute.For<IMemoryCache>(),
+            Substitute.For<ICacheService>(),
             Substitute.For<ILogger>());
         
         // Act
@@ -75,9 +65,8 @@ public class SizeServiceTests
         // Arrange
         _mockRepository.FindByDimensionsAsync(100,200).ReturnsNullForAnyArgs();
         var sizeService = new SizeService(
-            _mockIOption,
             _mockRepository,
-            Substitute.For<IMemoryCache>(),
+            Substitute.For<ICacheService>(),
             Substitute.For<ILogger>());
         
         // Act
@@ -94,9 +83,8 @@ public class SizeServiceTests
         var size = new Size();
         _mockRepository.InsertAsync(size).ReturnsForAnyArgs(1);
         var sizeService = new SizeService(
-            _mockIOption,
             _mockRepository,
-            Substitute.For<IMemoryCache>(),
+            Substitute.For<ICacheService>(),
             Substitute.For<ILogger>());
         
         // Act
@@ -114,9 +102,8 @@ public class SizeServiceTests
         // Arrange
         var size = new Size();
         var sizeService = new SizeService(
-            _mockIOption,
             _mockRepository,
-            Substitute.For<IMemoryCache>(),
+            Substitute.For<ICacheService>(),
             Substitute.For<ILogger>());
         
         // Act
@@ -131,9 +118,8 @@ public class SizeServiceTests
     {
         // Arrange
         var sizeService = new SizeService(
-            _mockIOption,
             _mockRepository,
-            Substitute.For<IMemoryCache>(),
+            Substitute.For<ICacheService>(),
             Substitute.For<ILogger>());
         
         // Act

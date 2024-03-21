@@ -1,4 +1,5 @@
 ﻿using CrpgP.Application;
+using CrpgP.Application.Cache;
 using CrpgP.Application.Health;
 using CrpgP.Application.Options;
 using CrpgP.Domain.Abstractions;
@@ -21,6 +22,7 @@ public static class ServicesBootstrapper
 
         // In-memory Cache
         serviceCollection.AddMemoryCache();
+        serviceCollection.AddSingleton<ICacheService, CacheService>();
         
         // Swagger
         serviceCollection.AddEndpointsApiExplorer();

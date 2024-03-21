@@ -1,10 +1,8 @@
 ﻿using CrpgP.Application;
-using CrpgP.Application.Options;
+using CrpgP.Application.Cache;
 using CrpgP.Domain;
 using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace Application.UnitTests;
@@ -12,16 +10,11 @@ namespace Application.UnitTests;
 public class PortraitServiceTests
 {
     private IPortraitRepository _mockRepository = null!;
-    private IOptions<MemoryCacheOptions> _mockIOption = null!;
 
     [SetUp]
     public void Setup()
     {
         _mockRepository = Substitute.For<IPortraitRepository>();
-        _mockIOption = Substitute.For<IOptions<MemoryCacheOptions>>();
-        
-        // Cache disabled by default
-        _mockIOption.Value.Returns(new MemoryCacheOptions { Enabled = false, EntryExpiryInSeconds = 1 });
     }
 
     [Test]
@@ -31,9 +24,8 @@ public class PortraitServiceTests
         var portrait = new Portrait { FileName = "portrait", Size = new Size()};
         _mockRepository.FindByIdAsync(1).ReturnsForAnyArgs(portrait);
         var portraitService = new PortraitService(
-            _mockIOption,
             _mockRepository,
-            Substitute.For<IMemoryCache>(),
+            Substitute.For<ICacheService>(),
             Substitute.For<ILogger>());
 
         // Act
@@ -57,9 +49,8 @@ public class PortraitServiceTests
         };
         _mockRepository.FindByIdsAsync([1,2,3]).ReturnsForAnyArgs(portraits);
         var portraitService = new PortraitService(
-            _mockIOption,
             _mockRepository,
-            Substitute.For<IMemoryCache>(),
+            Substitute.For<ICacheService>(),
             Substitute.For<ILogger>());
 
         // Act
@@ -78,9 +69,8 @@ public class PortraitServiceTests
         var portrait = new Portrait { FileName = "portrait", Size = new Size()};
         _mockRepository.InsertAsync(portrait).ReturnsForAnyArgs(1);
         var portraitService = new PortraitService(
-            _mockIOption,
             _mockRepository,
-            Substitute.For<IMemoryCache>(),
+            Substitute.For<ICacheService>(),
             Substitute.For<ILogger>());
         
         // Act
@@ -98,9 +88,8 @@ public class PortraitServiceTests
         // Arrange
         var portrait = new Portrait { FileName = "portrait", Size = new Size()};
         var portraitService = new PortraitService(
-            _mockIOption,
             _mockRepository,
-            Substitute.For<IMemoryCache>(),
+            Substitute.For<ICacheService>(),
             Substitute.For<ILogger>());
         
         // Act
@@ -115,9 +104,8 @@ public class PortraitServiceTests
     {
         // Arrange
         var gameService = new PortraitService(
-            _mockIOption,
             _mockRepository,
-            Substitute.For<IMemoryCache>(),
+            Substitute.For<ICacheService>(),
             Substitute.For<ILogger>());
         
         // Act

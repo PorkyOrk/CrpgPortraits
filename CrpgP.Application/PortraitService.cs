@@ -1,10 +1,8 @@
-﻿using CrpgP.Application.Options;
+﻿using CrpgP.Application.Cache;
 using CrpgP.Domain;
 using CrpgP.Domain.Abstractions;
 using CrpgP.Domain.Entities;
 using CrpgP.Domain.Errors;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace CrpgP.Application;
@@ -13,22 +11,21 @@ public class PortraitService
 {
     private readonly IPortraitRepository _repository;
     private readonly ILogger _logger;
-    private readonly bool _cacheEnabled;
-    private readonly CacheHelper<Portrait> _cacheHelper;
+    private readonly ICacheService _cacheService;
     
-    public PortraitService(IOptions<MemoryCacheOptions> memoryCacheOptions, IPortraitRepository repository, IMemoryCache cache, ILogger logger)
+    public PortraitService(
+        IPortraitRepository repository,
+        ICacheService cacheService,
+        ILogger logger)
     {
         _repository = repository;
         _logger = logger;
-        _cacheEnabled = memoryCacheOptions.Value.Enabled;
-        _cacheHelper = new CacheHelper<Portrait>(cache, memoryCacheOptions.Value.EntryExpiryInSeconds);
+        _cacheService = cacheService;
     }
     
     public async Task<Result> GetPortraitByIdAsync(int id)
     {
-        var portrait = _cacheEnabled 
-            ? await _cacheHelper.GetEntryFromCacheOrRepository(id,() => _repository.FindByIdAsync(id))
-            : await _repository.FindByIdAsync(id);
+        var portrait = await _cacheService.GetOrFetchEntryAsync($"portrait-{id}", () => _repository.FindByIdAsync(id));
         return portrait is null 
             ? Result.Failure(PortraitErrors.NotFound(id))
             : Result.Success(portrait);
@@ -37,16 +34,18 @@ public class PortraitService
     public async Task<Result> GetPortraitsByIdsAsync(IEnumerable<int> ids)
     {
         var portraitIds = ids as int[] ?? ids.ToArray();
-        var portraits = await _repository.FindByIdsAsync(portraitIds);
-        return portraits.Count > 0
+        var portraits =
+            await _cacheService.GetOrFetchEntryAsync($"portraits-ids{portraitIds}", () => _repository.FindByIdsAsync(portraitIds));
+        
+        return portraits != null && portraits.Count > 0
             ? Result.Success(portraits)
             : Result.Failure(PortraitErrors.NoneFound(portraitIds));
     }
     
     public async Task<Result> GetPortraitsCount()
-    {
+    { 
         var count = await _repository.CountAll();
-        
+
         return count == 0 
             ? Result.Failure(PortraitErrors.CountIsZero())
             : Result.Success(count);
@@ -54,10 +53,7 @@ public class PortraitService
 
     public async Task<Result> GetPortraitsPage(int page, int count)
     {
-        // TODO Cache
-        
-        var portraits = await _repository.FindAllPage(page, count);
-        
+        var portraits = await _cacheService.GetOrFetchEntryAsync($"portraits-pg{page}c{count}", () => _repository.FindAllPage(page, count));
         return portraits is null
             ? Result.Failure(PortraitErrors.PagePortraitsNotFound(page))
             : Result.Success(portraits);
@@ -81,6 +77,7 @@ public class PortraitService
     {
         try
         {
+            _cacheService.RemoveEntry($"portrait-{portrait.Id}");
             await _repository.UpdateAsync(portrait);
             return Result.Success();
         }
@@ -95,6 +92,7 @@ public class PortraitService
     {
         try
         {
+            _cacheService.RemoveEntry($"portrait-{id}");
             await _repository.DeleteAsync(id);
             return Result.Success();
         }
