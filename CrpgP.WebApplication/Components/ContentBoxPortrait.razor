@@ -1,6 +1,9 @@
 ﻿<div class="content-box">
     <img class="image" src="./images/placeholder-600x600.png" alt="Portrait image">
-    <span class="title">@DisplayName</span>
+    @if (DisplayName == string.Empty)
+    {
+        <span class="title">@DisplayName</span>
+    }
 </div>
 
 

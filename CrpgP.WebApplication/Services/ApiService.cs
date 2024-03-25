@@ -57,9 +57,9 @@ public class ApiService
         return await GetRequest<IEnumerable<T>?>(uri);
     }
     
-    public async Task<IEnumerable<T>?> GetAllPaginated<T>(int page, int itemsPerPage)
+    public async Task<IEnumerable<T>?> GetAllPaginated<T>(int page, int count)
     {
-        var uri = $"{_baseUrl}/api/v1/{GetSlugFromModelType<T>()}/all?page={page}&count={itemsPerPage}";
+        var uri = $"{_baseUrl}/api/v1/{GetSlugFromModelType<T>()}/all?page={page}&count={count}";
         return await GetRequest<IEnumerable<T>?>(uri);
     }
     
@@ -69,12 +69,18 @@ public class ApiService
         return await GetRequest<int>(uri);
     }
     
-    
-    private async Task<IEnumerable<int>?> GetAllIds<T>()
+    public async Task<IEnumerable<int>?> GetAllIds<T>()
     {
         var uri = $"{_baseUrl}/api/v1/{GetSlugFromModelType<T>()}/ids";
         return await GetRequest<IEnumerable<int>?>(uri);
     }
+
+    public async Task<IEnumerable<T>?> GetRelated<T>(int id, int count)
+    {
+        var uri = $"{_baseUrl}/api/v1/{GetSlugFromModelType<T>()}/related?id={id}&count={count}";
+        return await GetRequest<IEnumerable<T>?>(uri);
+    }
+    
     
     // TODO: Consider refactor to its own, non-generic class
     public async Task<IEnumerable<GameModel>> GetAllGames()
@@ -101,7 +107,7 @@ public class ApiService
         {
             //TODO Log error, maybe throw exception
         }
-        
+
         return games;
     }
 }

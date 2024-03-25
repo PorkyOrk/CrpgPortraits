@@ -16,6 +16,11 @@ public static class PortraitErrors
     {
         return Error.NotFound("Portrait.NoneFound", $"No portraits with the specified ids were found were not found. ids = '{portraitId}'");
     }
+    
+    public static Error NoRelatedFound(int portraitId)
+    {
+        return Error.NotFound("Portrait.NoRelatedFound", $"No related portraits for portrait id = '{portraitId}' were found.");
+    }
 
     public static Error PagePortraitsNotFound(int page)
     {

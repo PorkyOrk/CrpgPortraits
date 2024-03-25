@@ -28,6 +28,40 @@
                 that fits your character just right, for a more immersive role playing experience in your adventure.
             </p>
         </div>
+        
+        
+        
+        <div class="content-section games">
+            <div class="section-title">
+                <h2>Games</h2>
+            </div>
+            
+            <div class="featured-grid container-fluid">
+                @if (_games == null)
+                {
+                    <p>
+                        <em>Loading Games...</em>
+                    </p>
+                }
+                else
+                {
+                    <div class="row">
+                        @foreach (var game in _games)
+                        {
+                            <div class="col-md-2 game-box">
+                                <a href="/game/@game.Id">
+                                    <ContentBoxGame
+                                        DisplayName=@game.Name
+                                        Slug="slug"
+                                        ImagePath="path"/>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+        
 
         <div class="content-section portraits">
             <div class="section-title">
@@ -58,36 +92,8 @@
                 }
             </div>
         </div>
-        <div class="content-section games">
-            <div class="section-title">
-                <h2>Games</h2>
-            </div>
-            
-            <div class="featured-grid container-fluid">
-                @if (_games == null)
-                {
-                    <p>
-                        <em>Loading Games...</em>
-                    </p>
-                }
-                else
-                {
-                    <div class="row">
-                        @foreach (var game in _games)
-                        {
-                            <div class="col-md-2 portrait-box">
-                                <a href="/game/@game.Id">
-                                    <ContentBoxGame
-                                        DisplayName=@game.Name
-                                        Slug="slug"
-                                        ImagePath="path"/>
-                                </a>
-                            </div>
-                        }
-                    </div>
-                }
-            </div>
-        </div>
+        
+        
     </div>
 </div>
 

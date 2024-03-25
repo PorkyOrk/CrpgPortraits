@@ -28,4 +28,8 @@
       <ProjectReference Include="..\CrpgP.Infrastructure\CrpgP.Infrastructure.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Logs\" />
+    </ItemGroup>
+
 </Project>

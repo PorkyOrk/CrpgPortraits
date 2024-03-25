@@ -26,7 +26,7 @@ public static class PortraitEndpoints
 
         app.MapGet("api/v1/portrait/all/count", async Task<IResult> () =>
         {
-            var result = await portraitService.GetPortraitsCount();
+            var result = await portraitService.GetPortraitsCountAsync();
             return result.IsSuccess ? Results.Ok(result) : result.ToProblemDetails();
         });
         
@@ -34,7 +34,15 @@ public static class PortraitEndpoints
             [FromQuery(Name="page")] int page,
             [FromQuery(Name="count")] int count) =>
         {
-            var result = await portraitService.GetPortraitsPage(page, count);
+            var result = await portraitService.GetPortraitsPageAsync(page, count);
+            return result.IsSuccess ? Results.Ok(result) : result.ToProblemDetails();
+        });
+
+        app.MapGet("api/v1/portrait/related/", async Task<IResult> (
+            [FromQuery(Name = "id")] int id,
+            [FromQuery(Name = "count")] int count) =>
+        {
+            var result = await portraitService.GetRelatedPortraitsAsync(id, count);
             return result.IsSuccess ? Results.Ok(result) : result.ToProblemDetails();
         });
 

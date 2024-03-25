@@ -42,7 +42,7 @@ public class PortraitService
             : Result.Failure(PortraitErrors.NoneFound(portraitIds));
     }
     
-    public async Task<Result> GetPortraitsCount()
+    public async Task<Result> GetPortraitsCountAsync()
     { 
         var count = await _repository.CountAll();
 
@@ -51,12 +51,41 @@ public class PortraitService
             : Result.Success(count);
     }
 
-    public async Task<Result> GetPortraitsPage(int page, int count)
+    public async Task<Result> GetPortraitsPageAsync(int page, int count)
     {
         var portraits = await _cacheService.GetOrFetchEntryAsync($"portraits-pg{page}c{count}", () => _repository.FindAllPage(page, count));
         return portraits is null
             ? Result.Failure(PortraitErrors.PagePortraitsNotFound(page))
             : Result.Success(portraits);
+    }
+
+    public async Task<Result> GetRelatedPortraitsAsync(int id, int count)
+    {
+        var portraitResult = await GetPortraitByIdAsync(id);
+        if (!portraitResult.IsSuccess)
+        {
+            _logger.Error(PortraitErrors.NotFound(id).Description);
+            return Result.Failure(PortraitErrors.NotFound(id));
+        }
+
+        var portrait = (Portrait) portraitResult.Value!;
+        var tags = portrait.Tags;
+        
+        
+        // TODO Related logic 
+        // Use Tags to find related
+        
+        
+        
+        
+        
+        IEnumerable<Portrait> portraits = new List<Portrait>();
+        
+        
+        return portraits is null
+            ? Result.Failure(PortraitErrors.NoRelatedFound(id))
+            : Result.Success(portraits);
+
     }
 
     public async Task<Result> CreatePortraitAsync(Portrait portrait)

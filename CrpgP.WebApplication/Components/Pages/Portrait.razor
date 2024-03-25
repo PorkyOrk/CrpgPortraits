@@ -3,19 +3,75 @@
 @using CrpgP.WebApplication.Services
 @inject ApiService ApiService
 
-<h3>Portrait Page</h3>
-
-<p>Portrait id: @Id</p>
+<div class="content">
+    <div class="content-body">
+        <div class="content-section">
+            @if (_portrait == null)
+            {
+                <div class="section-title">
+                    <h2>Portrait Page</h2>
+                </div>
+                
+                <p>
+                    <em>Loading...</em>
+                </p>
+            }
+            else
+            {
+                <div class="section-title">
+                    <h2>@_portrait.FileName</h2>
+                </div>
+                
+                <div class="portrait-section">
+                    <div class="portrait-image-wrapper">
+                        <img src="images/placeholder-600x600.png" alt="portrait-image"/>
+                    </div>
+                </div>
+                
+                @if (_relatedPortraits == null)
+                {
+                    <p>
+                        <em>Loading Portraits...</em>
+                    </p>
+                }
+                else
+                {
+                    <div class="section-title">
+                        <h2>Portraits</h2>
+                    </div>
+                    <div class="related-portraits-grid">
+                        <div class="row">
+                            @foreach (var portrait in _relatedPortraits)
+                            {
+                                <div class="col-md-3 portrait-box">
+                                    <a href="/portrait/@portrait.Id">
+                                        <ContentBoxPortrait
+                                            DisplayName=@portrait.DisplayName
+                                            Slug="slug"
+                                            ImagePath="path"/>
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
 
 @code {
     [Parameter]
     public int Id { get; set; }
 
     private PortraitModel? _portrait;
-
+    private IEnumerable<PortraitModel>? _relatedPortraits;
+    private const int RelatedCount = 8;
     
     protected override async Task OnInitializedAsync()
     {
         _portrait = await ApiService.GetByIdAsync<PortraitModel>(Id);
+        _relatedPortraits = await ApiService.GetRelated<PortraitModel>(Id, RelatedCount);
     }
+
 }

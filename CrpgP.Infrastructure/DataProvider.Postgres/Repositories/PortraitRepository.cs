@@ -80,6 +80,7 @@ public class PortraitRepository : RepositoryBase, IPortraitRepository
         return portraits;
     }
 
+
     public async Task<int> InsertAsync(Portrait portrait)
     {
         await using var cnn = await DataSource.OpenConnectionAsync();
@@ -128,6 +129,8 @@ public class PortraitRepository : RepositoryBase, IPortraitRepository
         await cnn.QueryAsync(sql, new {
             PortraitId = portraitId
         });
+
+        await DeletePortraitTags(cnn, portraitId);
     }
     
     
@@ -149,7 +152,6 @@ public class PortraitRepository : RepositoryBase, IPortraitRepository
     private static async Task InsertPortraitTags(IDbConnection cnn, int portraitId, IEnumerable<int> tagIds)
     {
         const string sql = "INSERT INTO tag_portrait (tag_id, portrait_id) VALUES (@PortraitId, @TagId);";
-
         foreach (var tagId in tagIds)
         {
             await cnn.QueryAsync(sql, new {
@@ -161,14 +163,17 @@ public class PortraitRepository : RepositoryBase, IPortraitRepository
     
     private static async Task UpdatePortraitTags(IDbConnection cnn, int portraitId, IEnumerable<int> tagIds)
     {
-        const string sqlDelete = "DELETE FROM tag_portrait WHERE portrait_id = @PortraitId;";
-        const string sqlInsert = "INSERT INTO tag_portrait (tag_id, portrait_id) VALUES (@TagId, @PortraitId);";
-
-        await cnn.QueryAsync(sqlDelete, new { PortraitId = portraitId });
-        
+        await DeletePortraitTags(cnn, portraitId);
+        const string sql = "INSERT INTO tag_portrait (tag_id, portrait_id) VALUES (@TagId, @PortraitId);";
         foreach (var tagId in tagIds)
         {
-            await cnn.QueryAsync(sqlInsert, new { TagId = tagId, PortraitId = portraitId });
+            await cnn.QueryAsync(sql, new { TagId = tagId, PortraitId = portraitId });
         }
+    }
+
+    private static async Task DeletePortraitTags(IDbConnection cnn, int portraitId)
+    {
+        const string sql = "DELETE FROM tag_portrait WHERE portrait_id = @PortraitId;";
+        await cnn.QueryAsync(sql, new { PortraitId = portraitId});
     }
 }

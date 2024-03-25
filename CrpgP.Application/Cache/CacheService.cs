@@ -39,19 +39,6 @@ public class CacheService : ICacheService
         return result;
     }
     
-    // public T? GetOrFetchEntry<T>(string key, Func<Task<T>> repositoryMethod)
-    // {
-    //     if (_enabled)
-    //     {
-    //         if (_cache.TryGetValue(key, out var entry) && entry != null)
-    //         {
-    //             var result = JsonSerializer.Deserialize<T>((JsonDocument)entry);
-    //             return result;
-    //         }
-    //     }
-    //     return repositoryMethod.Invoke().GetAwaiter().GetResult();
-    // }
-    
     public void AddEntry<T>(string key, T entry)
     {
         if (_enabled && entry != null)

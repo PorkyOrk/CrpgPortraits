@@ -2,7 +2,7 @@
     /*width: 100%;*/
     /*height: auto;*/
     background-color: black;
-    
+
     .banner-image {
         display: block;
         margin-left: auto;
@@ -13,12 +13,12 @@
     }
 }
 
-.navbar-horizontal-always {
-    flex-direction: row;
-}
+/*.navbar-horizontal-always {*/
+/*    flex-direction: row;*/
+/*}*/
 
 .content {
-    
+
     .content-body {
         margin: 0 45px;
 
@@ -36,11 +36,15 @@
     width: 24%;
 }
 
-.game-box {
-    padding: 12px;
+/*.game-box {*/
+/*    padding: 12px;*/
+/*}*/
+
+.game-section {
+    margin-bottom: 45px;
 }
 
-.featured-grid {
+.portraits-grid {
     display: grid;
 
     .content-box {
