@@ -69,23 +69,31 @@ public class PortraitService
         }
 
         var portrait = (Portrait) portraitResult.Value!;
-        var tags = portrait.Tags;
+        var portraits = new List<Portrait>();
+        var tagIds = portrait.Tags.Select(t => t.Id).ToArray();
+        var relatedPortraits = await _repository.FindRelatedByTags(portrait.Id, tagIds, count);
         
+        if (relatedPortraits != null)
+        {
+            portraits.AddRange(relatedPortraits);
+        }
+
+        if (portraits.Count >= count)
+        {
+            return Result.Success(portraits);
+        }
         
-        // TODO Related logic 
-        // Use Tags to find related
+        var missingCount = count - portraits.Count;
+        var excludeIds = portraits.Select(e => e.Id).Append(portrait.Id).ToArray();
+        var random = await _repository.FindRandomBySize(portrait.Size, excludeIds, missingCount);
+        if (random != null)
+        {
+            portraits.AddRange(random);
+        }
         
-        
-        
-        
-        
-        IEnumerable<Portrait> portraits = new List<Portrait>();
-        
-        
-        return portraits is null
+        return portraits.Count == 0
             ? Result.Failure(PortraitErrors.NoRelatedFound(id))
             : Result.Success(portraits);
-
     }
 
     public async Task<Result> CreatePortraitAsync(Portrait portrait)

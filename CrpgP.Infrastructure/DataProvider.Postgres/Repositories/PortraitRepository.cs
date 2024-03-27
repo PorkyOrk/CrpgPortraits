@@ -39,7 +39,7 @@ public class PortraitRepository : RepositoryBase, IPortraitRepository
         return portrait;
     }
 
-    public async Task<Dictionary<int,Portrait?>> FindByIdsAsync(IEnumerable<int> portraitIds)
+    public async Task<Dictionary<int,Portrait?>?> FindByIdsAsync(IEnumerable<int> portraitIds)
     {
         var portraits = new Dictionary<int, Portrait?>();
         
@@ -58,6 +58,62 @@ public class PortraitRepository : RepositoryBase, IPortraitRepository
         const string sql = "SELECT COUNT(*) FROM portraits";
         var count = await cnn.QuerySingleAsync<int>(sql);
         return count;
+    }
+    
+    public async Task<IEnumerable<Portrait>?> FindRelatedByTags(int portraitId, int[] tagIds, int count)
+    {
+        await using var cnn = await DataSource.OpenConnectionAsync();
+        const string sql =
+            "SELECT " +
+            "DISTINCT portraits.id " +
+            "FROM portraits " +
+            "RIGHT JOIN tag_portrait ON portraits.id = tag_portrait.portrait_id " +
+            "WHERE tag_portrait.tag_id = ANY (@TagIds) " +
+            "AND portraits.Id != @PortraitId " +
+            "LIMIT @Count";
+        var ids = await cnn.QueryAsync<int>(sql, new
+        {
+            TagIds = tagIds,
+            PortraitId = portraitId,
+            Count = count
+        });
+        var result = new List<Portrait>();
+        foreach (var id in ids)
+        {
+            var p = await FindByIdAsync(id);
+            result.Add(p!);
+        }
+        return result;
+    }
+
+    public async Task<IEnumerable<Portrait>?> FindRandomBySize(Size size, int[] excludeIds, int count)
+    {
+        await using var cnn = await DataSource.OpenConnectionAsync();
+        const string sql =
+            "SELECT * FROM portraits " +
+            "LEFT JOIN sizes ON portraits.size_id = sizes.id " +
+            "WHERE portraits.size_id = @SizeId " +
+            "AND portraits.id != ALL (@ExcludeIds) " +
+            "LIMIT @Count";
+        var portraits = cnn.QueryAsync<Portrait, Size, Portrait>(sql, (portrait, s) =>
+        {
+            portrait.Size = s;
+            return portrait;
+        }, new
+        {
+            SizeId = size.Id,
+            ExcludeIds = excludeIds,
+            Count = count
+        }).GetAwaiter().GetResult().ToList();
+        if (portraits.Count <= 0)
+        {
+            return null;
+        }
+        foreach (var p in portraits)
+        {
+            p.Tags = await FindPortraitTags(cnn, p.Id);
+        }
+        return portraits;
     }
 
     public async Task<IEnumerable<Portrait>?> FindAllPage(int page, int count)
